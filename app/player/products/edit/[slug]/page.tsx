@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FaEdit, FaTrash, FaPlus, FaArrowLeft, FaSave } from 'react-icons/fa';
+import { useAuthRedirect } from '../../../hooks/useAuthRedirect';
 
 interface Product {
   slug: string;
@@ -34,6 +35,9 @@ export default function ProductEditPage() {
     price: '',
     description: ''
   });
+
+  // Redirection si non authentifié
+  useAuthRedirect();
 
   // 🔹 Charger le produit spécifique pour l'édition
   const fetchProduct = async () => {

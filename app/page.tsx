@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import DOMPurify from 'dompurify';
 import { Flame, Sparkles, Gem, Star, ArrowRight } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase } from '@/lib/supabaseClient';
 import ProductCard from '@/components/Products/ProductCard';
 import BannerHero from '@/components/BannerHero/BannerHero';
 import RecentBlogPosts from '@/components/Bloging/RecentBlogPosts';
@@ -14,7 +14,6 @@ import { services } from './services/data/services';
 import truncateText from '@/lib/truncateText';
 
 export default function HomePage() {
-  const supabase = createClientComponentClient();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +23,7 @@ export default function HomePage() {
       const { data, error } = await supabase.from('Propulser').select('*');
       if (error) console.error(error);
       setProducts(
-        data?.map((p) => ({
+        data?.map((p: any) => ({
           ...p,
           name: DOMPurify.sanitize(p.name || ''),
           description: DOMPurify.sanitize(p.description || ''),

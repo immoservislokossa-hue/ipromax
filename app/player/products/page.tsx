@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 interface Product {
   slug: string;
@@ -135,7 +136,6 @@ export default function ProductsPage() {
                         <FaEdit />
                       </Link>
 
-                   
                       <button
                         onClick={() => handleDelete(product.slug)}
                         className={`text-red-600 hover:text-red-800 transition ${

@@ -12,6 +12,7 @@ import {
   Upload,
   ArrowLeft,
 } from 'lucide-react';
+import { useAuthRedirect } from '../../../hooks/useAuthRedirect';
 
 // ✅ Chargement dynamique du Tiptap Editor
 const TiptapEditor = dynamic(() => import('@/app/player/blog/TiptapEditor'), {
@@ -44,6 +45,9 @@ export default function EditBlogPage() {
     seo_keywords: '',
     is_published: false,
   });
+
+  // Redirection si non authentifié
+  useAuthRedirect();
 
   // 🔹 Charger les données
   useEffect(() => {

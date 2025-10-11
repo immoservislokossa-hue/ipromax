@@ -1,4 +1,5 @@
 import ProductClient from './ProductClient';
+import Link from 'next/link';
 import { getProductBySlug, getRelatedProducts } from '@/lib/products';
 
 export const revalidate = 60; // Revalidation ISR toutes les 60s
@@ -20,12 +21,12 @@ export default async function ProductPage({
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">❌ Produit introuvable</h2>
           <p className="text-gray-500">Ce produit n’existe plus ou a été retiré de la boutique.</p>
-          <a
+          <Link
             href="/products"
             className="inline-block mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
           >
             Retour à la boutique
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -47,7 +48,7 @@ export default async function ProductPage({
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {related.map((p) => (
-              <a
+              <Link
                 key={p.slug}
                 href={`/products/${p.slug}`}
                 className="group bg-white rounded-xl shadow-md hover:shadow-lg border border-gray-100 transition-all duration-300 overflow-hidden"
@@ -67,7 +68,7 @@ export default async function ProductPage({
                     {parseInt(p.price).toLocaleString()} FCFA
                   </p>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </section>

@@ -27,6 +27,7 @@ import {
   FolderOpen,
   MessageSquare,
 } from 'lucide-react';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 interface Author {
   id: string;
@@ -129,6 +130,8 @@ export default function BlogListPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
   const [editingTag, setEditingTag] = useState<BlogTag | null>(null);
+
+  useAuthRedirect();
 
   // 🔹 Charger toutes les données
   useEffect(() => {

@@ -26,10 +26,10 @@ const BlogPreviewCard: React.FC<BlogPreviewCardProps> = ({
   category_name,
   author_name,
 }) => {
-  if (!slug) return null;
-
   const href = `/blog/${slug}`;
   const [imageError, setImageError] = useState(false);
+
+  if (!slug) return null;
 
   // 🔹 Gestion automatique du fallback
   const getImageSrc = () => {

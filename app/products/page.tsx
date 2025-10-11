@@ -5,7 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import ProductGrid from '@/components/Products/ProductGrid';
 import SearchFilters from '@/components/header/SearchFilters';
 import DOMPurify from 'dompurify';
-import Footer from '@/components/Footer/Footer';
+
 
 // ✅ Interface produit alignée sur ta table Supabase "Propulser"
 export interface Product {

@@ -5,7 +5,9 @@ import Image from "next/image";
 import RecentProducts from "@/app/components/Products/RecentProducts";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, Clock, Eye, ArrowLeft, Share2, Bookmark, User, Tag } from "lucide-react";
+import { Calendar, Clock, Eye, ArrowLeft, User, Tag } from "lucide-react";
+import ArticleActions from '@/app/components/Bloging/ArticleActions';
+import SocialShareButtons from '@/app/components/Bloging/SocialShareButtons';
 
 // --- Configuration
 export const revalidate = 3600;
@@ -101,9 +103,11 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
     console.log('✅ Article trouvé:', post.title);
     
     // Transformation des tags - CORRECTION
-    const tags = tagsData?.map(item => item.blog_tags).filter((tag): tag is { id: number; slug: string; name: string } => 
-      tag !== null && typeof tag === 'object' && 'id' in tag && 'slug' in tag && 'name' in tag
-    ) || [];
+    // Certains items retournent `blog_tags` comme tableau, on aplatit tout puis on filtre
+    const tags = (tagsData ?? []).flatMap((item: any) => (item.blog_tags ?? [])).filter(
+      (tag): tag is { id: number; slug: string; name: string } =>
+        !!tag && typeof tag === 'object' && 'id' in tag && 'slug' in tag && 'name' in tag
+    );
 
     // Transformation des données pour correspondre à l'interface
     const transformedData: BlogPost = {
@@ -394,22 +398,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                     </div>
 
                     {/* Actions - CORRIGÉ avec gestion d'événements */}
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={handleBookmark}
-                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                        aria-label="Ajouter aux favoris"
-                      >
-                        <Bookmark size={18} />
-                      </button>
-                      <button 
-                        onClick={handleShare}
-                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                        aria-label="Partager l'article"
-                      >
-                        <Share2 size={18} />
-                      </button>
-                    </div>
+                    <ArticleActions title={data.title} excerpt={data.excerpt || ''} />
                   </div>
 
                   {/* Titre */}
@@ -492,29 +481,8 @@ export default async function BlogPostPage({ params }: PageProps) {
                     
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-slate-500">Partager :</span>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}
-                          className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center hover:bg-blue-200 transition-colors"
-                          aria-label="Partager sur Facebook"
-                        >
-                          <span className="text-sm font-semibold">f</span>
-                        </button>
-                        <button 
-                          onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(data.title)}`, '_blank')}
-                          className="w-10 h-10 bg-sky-100 text-sky-600 rounded-lg flex items-center justify-center hover:bg-sky-200 transition-colors"
-                          aria-label="Partager sur Twitter"
-                        >
-                          <span className="text-sm font-semibold">t</span>
-                        </button>
-                        <button 
-                          onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank')}
-                          className="w-10 h-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center hover:bg-slate-200 transition-colors"
-                          aria-label="Partager sur LinkedIn"
-                        >
-                          <span className="text-sm font-semibold">in</span>
-                        </button>
-                      </div>
+                      {/* Social share buttons (client component) */}
+                      <SocialShareButtons title={data.title} />
                     </div>
                   </div>
                 </div>
@@ -528,12 +496,12 @@ export default async function BlogPostPage({ params }: PageProps) {
                 >
                   ← Retour au blog
                 </Link>
-                <button 
-                  onClick={() => alert('Fonctionnalité à implémenter')}
+                <Link
+                  href="#"
                   className="bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 border border-white/20 shadow-sm hover:shadow-md transition-all hover:-translate-y-1 text-slate-700 hover:text-slate-900"
                 >
                   Article suivant →
-                </button>
+                </Link>
               </div>
             </main>
           </div>

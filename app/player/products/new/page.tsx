@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 export default function NewProductPage() {
   const supabase = createClientComponentClient();
   const router = useRouter();
+  useAuthRedirect();
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');

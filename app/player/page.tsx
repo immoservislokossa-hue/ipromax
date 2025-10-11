@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { FaPenFancy, FaShoppingBag } from 'react-icons/fa';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 
 interface StatsCard {
   title: string;
@@ -34,6 +35,8 @@ export default function PlayerDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useAuthRedirect();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
