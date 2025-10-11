@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Animations === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* globals.css ou tailwind.config.js */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+/* === Configuration des polices === */
+
+@keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+          }
+        }
+        
+        @keyframes float-delayed {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-15px) rotate(-3deg);
+          }
+        }
+        
+        .animate-fade-in-up {
+          animation: fade-in-up 0.8s ease-out forwards;
+        }
+        
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-delayed {
+          animation: float-delayed 8s ease-in-out infinite;
+        }
+        
+        .animation-delay-200 {
+          animation-delay: 200ms;
+        }
+        
+        .animation-delay-400 {
+          animation-delay: 400ms;
+        }
+        
+        .animation-delay-600 {
+          animation-delay: 600ms;
+        }
+        
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+
+        @layer components {
+  .btn-primary {
+    @apply relative overflow-hidden text-white px-8 py-3 rounded-full font-medium uppercase tracking-wide transition-transform duration-300 ease-in-out;
+    background: linear-gradient(135deg, #0f23e8 0%, #0017b3 100%);
+  }
+
+  .btn-primary::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -100%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      transparent 30%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 70%
+    );
+    transform: rotate(25deg);
+    animation: shine 2.8s linear infinite;
+    filter: blur(6px);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px) scale(1.03);
+    background: linear-gradient(135deg, #162bff, #0a1acb);
+  }
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+    opacity: 0.6;
+  }
+  100% {
+    left: 150%;
+    opacity: 1;
+  }
+}

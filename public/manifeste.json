@@ -1,0 +1,70 @@
+{
+  "name": "Propulser - Formations, Ebooks & Outils Digitaux",
+  "short_name": "Propulser",
+  "description": "Plateforme digitale premium : formations, ebooks, prompts et outils innovants pour booster vos compétences.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F2FF",
+  "theme_color": "#0F23E8",
+  "icons": [
+    {
+      "src": "/icons/propulser.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/propulser.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/propulser.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "books", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Boutique",
+      "short_name": "Boutique",
+      "description": "Accéder rapidement aux produits et formations",
+      "url": "/products",
+      "icons": [{ "src": "/icons/propulser.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Blog",
+      "short_name": "Blog",
+      "description": "Lire nos derniers articles",
+      "url": "/blog",
+      "icons": [{ "src": "/icons/propulser.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Contact",
+      "short_name": "Contact",
+      "description": "Entrer en contact avec Propulser",
+      "url": "/contact",
+      "icons": [{ "src": "/icons/propulser.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/homepage.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Page d’accueil Propulser"
+    },
+    {
+      "src": "/screenshots/products.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "label": "Boutique Propulser"
+    }
+  ]
+}
