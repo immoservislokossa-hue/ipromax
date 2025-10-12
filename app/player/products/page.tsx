@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FaEdit, FaTrash, FaPlus } from 'react-icons/fa';
-import { useAuthRedirect } from '../hooks/useAuthRedirect';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 interface Product {
   slug: string;
@@ -17,6 +17,8 @@ interface Product {
 
 export default function ProductsPage() {
   const supabase = createClientComponentClient();
+  // redirect to /login if not authenticated
+  useAuthRedirect();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);

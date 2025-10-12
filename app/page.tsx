@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import DOMPurify from 'dompurify';
-import { Flame, Sparkles, Gem, Star, ArrowRight } from 'lucide-react';
+import { Flame, Star, ArrowRight } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import ProductCard from '@/components/Products/ProductCard';
 import BannerHero from '@/components/BannerHero/BannerHero';

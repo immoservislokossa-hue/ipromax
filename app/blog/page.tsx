@@ -9,10 +9,6 @@ import BlogBannerHero from '@/app/components/BannerHero/BlogBannerHero';
 import { useBlogPosts, BlogPost } from '@/app/hooks/useBlogPosts';
 import RecentProducts from '@/app/components/Products/RecentProducts';
 
-// --- Couleur principale
-const PRIMARY_COLOR = '#0F23E8';
-const PRIMARY_COLOR_HOVER = '#0A1ACF';
-
 // --- Composant de filtre style tech
 function BlogFilters({ 
   onSearchChange, 
@@ -90,19 +86,20 @@ function BlogFilters({
               <div className="absolute inset-0 bg-gradient-to-r from-[#0F23E8]/5 to-[#0F23E8]/10 rounded-xl blur-sm" />
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" size={18} />
-                <select
-                  value={localCategory}
-                  onChange={handleCategoryChange}
-                  className="relative pl-10 pr-8 py-4 bg-white/90 border-2 border-gray-300/50 rounded-xl focus:ring-2 focus:ring-[#0F23E8]/30 focus:border-[#0F23E8] text-gray-800 font-medium appearance-none cursor-pointer transition-all duration-300 hover:border-[#0F23E8]/50 min-w-[180px]"
-                >
-                  <option value="">🧠 Toutes les catégories</option>
-                  <option value="Technologie">🚀 Technologie</option>
-                  <option value="Design">🎨 Design</option>
-                  <option value="Marketing">📈 Marketing</option>
-                  <option value="Développement">💻 Développement</option>
-                  <option value="SEO">🔍 SEO</option>
-                  <option value="Mobile">📱 Mobile</option>
-                </select>
+         <select
+  value={localCategory}
+  onChange={handleCategoryChange}
+  aria-label="Filtrer par catégorie"
+  className="relative pl-10 pr-8 py-4 bg-white/90 border-2 border-gray-300/50 rounded-xl focus:ring-2 focus:ring-[#0F23E8]/30 focus:border-[#0F23E8] text-gray-800 font-medium appearance-none cursor-pointer transition-all duration-300 hover:border-[#0F23E8]/50 min-w-[180px]"
+>
+  <option value="">🧠 Toutes les catégories</option>
+  <option value="Technologie">🚀 Technologie</option>
+  <option value="Design">🎨 Design</option>
+  <option value="Marketing">📈 Marketing</option>
+  <option value="Développement">💻 Développement</option>
+  <option value="SEO">🔍 SEO</option>
+  <option value="Mobile">📱 Mobile</option>
+</select>
               </div>
             </div>
             

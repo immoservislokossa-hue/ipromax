@@ -27,7 +27,7 @@ import {
   FolderOpen,
   MessageSquare,
 } from 'lucide-react';
-import { useAuthRedirect } from '../hooks/useAuthRedirect';
+import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 interface Author {
   id: string;

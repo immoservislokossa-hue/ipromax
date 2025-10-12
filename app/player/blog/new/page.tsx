@@ -7,7 +7,7 @@ import { createClient } from '@/app/utils/supabase/client';
 import { motion } from 'framer-motion';
 import { Loader2, Upload, Save } from 'lucide-react';
 import slugify from 'slugify';
-import { useAuthRedirect } from '../../hooks/useAuthRedirect';
+import { useAuthRedirect } from '../../../hooks/useAuthRedirect';
 
 // ✅ Chargement dynamique de l’éditeur (évite SSR crash)
 const TiptapEditor = dynamic(() => import('../TiptapEditor'), {
