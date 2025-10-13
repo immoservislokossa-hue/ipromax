@@ -38,6 +38,7 @@
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
     "react-phone-input-2": "^2.15.1",
+    "resend": "^6.1.2",
     "showdown": "^2.1.0",
     "slugify": "^1.6.6",
     "supabase": "^2.48.3",

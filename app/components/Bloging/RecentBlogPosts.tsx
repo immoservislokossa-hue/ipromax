@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import BlogPreviewCard from './BlogPreviewCard';
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import BlogPreviewCard from "./BlogPreviewCard";
 
 interface Blog {
   id: string;
@@ -10,62 +10,66 @@ interface Blog {
   title: string;
   excerpt: string;
   cover_image: string | null;
-  created_at: string;
-  category?: { name: string } | null;
+  published_at: string;
+  category_name: string;
 }
 
-export default function RecentBlogPosts() {
+interface RecentBlogPostsProps {
+  limit?: number; // ✅ nouvelle prop optionnelle
+}
+
+export default function RecentBlogPosts({ limit = 8 }: RecentBlogPostsProps) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchBlogs() {
       try {
+        if (!isMounted) return;
         setLoading(true);
 
         const { data, error } = await supabase
-          .from('blog_posts')
+          .from("published_blog_posts")
           .select(`
             id,
             slug,
             title,
             excerpt,
             cover_image,
-            created_at,
-            category:blog_categories(name)
+            published_at,
+            category_name
           `)
-          .eq('is_published', true)
-          .order('created_at', { ascending: false })
-          .limit(8);
+          .order("published_at", { ascending: false })
+          .limit(limit); // ✅ utilisation dynamique du paramètre
 
         if (error) throw error;
 
-        // ✅ Correction ici : aplatir la catégorie (de tableau à objet simple)
-        const normalizedData =
-          (data || []).map((post: any) => ({
-            id: post.id,
-            slug: post.slug,
-            title: post.title,
-            excerpt: post.excerpt,
-            cover_image: post.cover_image,
-            created_at: post.created_at,
-            category:
-              Array.isArray(post.category) && post.category.length > 0
-                ? post.category[0]
-                : { name: 'Non catégorisé' },
-          })) ?? [];
+        const normalizedData = (data || []).map((post: any) => ({
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          excerpt: post.excerpt || "",
+          cover_image: post.cover_image || null,
+          published_at: post.published_at || new Date().toISOString(),
+          category_name: post.category_name || "Non catégorisé",
+        }));
 
-        setBlogs(normalizedData);
+        if (isMounted) setBlogs(normalizedData);
       } catch (err: any) {
-        console.error('Erreur récupération blogs récents:', err.message || err);
-        setBlogs([]);
+        console.error("Erreur récupération blogs récents:", err.message || err);
+        if (isMounted) setBlogs([]);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     }
 
     fetchBlogs();
-  }, []);
+    return () => {
+      isMounted = false;
+    };
+  }, [limit]); // ✅ re-fetch si la limite change
 
   if (loading) {
     return (
@@ -86,7 +90,9 @@ export default function RecentBlogPosts() {
     return (
       <section className="my-12 text-center">
         <h2 className="text-2xl font-bold mb-4 text-[#0F23E8]">Articles récents</h2>
-        <p className="text-gray-500">Aucun article disponible pour le moment.</p>
+        <p className="text-gray-500">
+          Aucun article disponible pour le moment.
+        </p>
       </section>
     );
   }
@@ -103,10 +109,10 @@ export default function RecentBlogPosts() {
             id={blog.id}
             slug={blog.slug}
             title={blog.title}
-            excerpt={blog.excerpt || ''}
-            cover_image={blog.cover_image || '/default-article-image.jpg'}
-            category_name={blog.category?.name || 'Non catégorisé'}
-            published_at={blog.created_at}
+            excerpt={blog.excerpt}
+            cover_image={blog.cover_image || "/default-article-image.jpg"}
+            category_name={blog.category_name}
+            published_at={blog.published_at}
           />
         ))}
       </div>

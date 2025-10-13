@@ -42,11 +42,13 @@ export default function BottomNav() {
   const handleNavigation = (href: string) => router.push(href);
 
   return (
-    <div className="fixed bottom-4 inset-x-0 z-50 flex justify-center md:hidden">
+    <div 
+      className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden w-full max-w-[100vw] overflow-x-hidden"
+    >
       <div
-        className={`relative bg-black backdrop-blur-xl border border-blue-400/10 shadow-lg shadow-blue-900/20 rounded-2xl p-2 flex items-center justify-between w-[95%] max-w-md mx-auto transition-all duration-500 ${
-          mounted ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'
-        }`}
+        className={`relative bg-black/90 backdrop-blur-xl border border-blue-400/10 shadow-lg shadow-blue-900/20 rounded-2xl p-2 flex items-center justify-between w-[94%] sm:w-[90%] max-w-md mx-auto transition-all duration-500
+          ${mounted ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}
+        `}
       >
         {navigationItems.map((item) => {
           const Icon = item.icon;
@@ -56,17 +58,19 @@ export default function BottomNav() {
             <button
               key={item.id}
               onClick={() => handleNavigation(item.href)}
-              className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-xl transition-all duration-300 ease-out ${
-                isActive
+              className={`relative flex flex-col items-center justify-center px-3 py-2 rounded-xl transition-all duration-300 ease-out min-w-[60px]
+                ${isActive
                   ? 'bg-blue-700 text-white shadow-md shadow-blue-800/40 scale-110'
-                  : 'text-blue-100/80 hover:text-white hover:scale-105 hover:bg-blue-500/10'
-              }`}
+                  : 'text-blue-100/80 hover:text-white hover:scale-105 hover:bg-blue-500/10'}
+              `}
             >
               <div className="relative flex items-center justify-center">
                 <Icon
                   size={22}
                   className={`transition-transform duration-300 ${
-                    isActive ? 'animate-pulse drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'group-hover:rotate-12'
+                    isActive
+                      ? 'animate-pulse drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]'
+                      : 'group-hover:rotate-12'
                   }`}
                   strokeWidth={isActive ? 2.5 : 2}
                 />

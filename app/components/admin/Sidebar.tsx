@@ -15,7 +15,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
   const links = [
     { href: '/player', label: 'Dashboard', icon: <FaHome /> },
     { href: '/player/blog', label: 'Articles', icon: <FaPenFancy /> },
-    { href: '/player/products', label: 'Produits', icon: <FaShoppingBag /> },
+  { href: '/player/produits', label: 'Produits', icon: <FaShoppingBag /> },
   ];
 
   return (

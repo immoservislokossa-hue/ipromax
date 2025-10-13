@@ -52,7 +52,7 @@ export default function TopBar() {
           {/* Menu */}
           <nav className="hidden md:flex gap-10 justify-center flex-1">
             <Link
-              href="/products"
+              href="/produits"
               className="text-[#0F23E8] hover:text-[#0A1ACF] font-medium transition-colors"
             >
               Produits

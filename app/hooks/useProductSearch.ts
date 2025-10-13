@@ -1,42 +1,80 @@
-// hooks/useProductSearch.ts
-import { useState, useMemo } from 'react';
+'use client';
+
+import { useState, useMemo, useCallback } from 'react';
+import DOMPurify from 'dompurify';
 
 interface UseProductSearchProps {
   initialProducts: any[] | null | undefined;
   searchKeys: string[];
 }
 
-export function useProductSearch({ initialProducts, searchKeys }: UseProductSearchProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
 
-  // Garantir que safeInitialProducts est toujours un tableau
+export function useProductSearch({ initialProducts, searchKeys }: UseProductSearchProps) {
+  const [searchTerm, setSearchTermRaw] = useState('');
+  const [selectedCategory, setSelectedCategoryRaw] = useState('');
+
+  /**  Nettoyage et validation sécurisée des entrées utilisateur */
+  const sanitizeInput = useCallback((value: string) => {
+    if (!value) return '';
+    //  Neutraliser HTML / scripts
+    let clean = DOMPurify.sanitize(value, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+
+    //  Supprimer caractères suspects
+    clean = clean.replace(/[<>$`{};]/g, '');
+
+    // Limiter la longueur
+    return clean.trim().slice(0, 64);
+  }, []);
+
+  /** Gestion sécurisée des changements */
+  const setSearchTerm = useCallback(
+    (val: string) => setSearchTermRaw(sanitizeInput(val)),
+    [sanitizeInput]
+  );
+  const setSelectedCategory = useCallback(
+    (val: string) => setSelectedCategoryRaw(sanitizeInput(val)),
+    [sanitizeInput]
+  );
+
+  /** Normalisation des produits */
   const safeInitialProducts = useMemo(() => {
-    if (!initialProducts) return [];
-    if (!Array.isArray(initialProducts)) return [];
-    return initialProducts;
+    if (!initialProducts || !Array.isArray(initialProducts)) return [];
+
+    return initialProducts.map((p) => ({
+      ...p,
+      name: DOMPurify.sanitize(p.name || ''),
+      description: DOMPurify.sanitize(p.description || ''),
+      category: DOMPurify.sanitize(p.category || ''),
+      brand: DOMPurify.sanitize(p.brand || ''),
+    }));
   }, [initialProducts]);
 
-  // Extraction des catégories uniques
+  /** Liste unique des catégories */
   const categories = useMemo(() => {
-    return Array.from(new Set(safeInitialProducts.map(p => p.category))).filter(Boolean);
+    const set = new Set<string>();
+    safeInitialProducts.forEach((p) => {
+      if (p.category && typeof p.category === 'string') set.add(p.category);
+    });
+    return Array.from(set);
   }, [safeInitialProducts]);
 
-  // Filtrage des produits - toujours retourner un tableau
+  /** 🔎 Filtrage intelligent */
   const filteredProducts = useMemo(() => {
-    if (!safeInitialProducts || !Array.isArray(safeInitialProducts)) return [];
-    
-    return safeInitialProducts.filter(product => {
-      // Filtre par recherche
+    return safeInitialProducts.filter((product) => {
+      // Recherche
       const matchesSearch =
-        searchTerm === '' ||
-        searchKeys.some(key => {
-          const value = product[key];
-          return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        !searchTerm ||
+        searchKeys.some((key) => {
+          const val = product[key];
+          return (
+            val &&
+            val.toString().toLowerCase().includes(searchTerm.toLowerCase())
+          );
         });
 
-      // Filtre par catégorie
-      const matchesCategory = !selectedCategory || product.category === selectedCategory;
+      // Catégorie
+      const matchesCategory =
+        !selectedCategory || product.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });

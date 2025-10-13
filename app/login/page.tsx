@@ -1,56 +1,60 @@
 'use client';
 import { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function LoginPage() {
-  const supabase = createClientComponentClient();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) return setErrorMsg(error.message);
-    router.push('/player');
+    setLoading(true);
+    setError('');
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) setError('Identifiants invalides.');
+    else router.push('/player');
+
+    setLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
-      >
-        <h1 className="text-2xl font-bold text-center text-blue-600 mb-6">
-          Connexion Admin
-        </h1>
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+      <form onSubmit={handleLogin} className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100 w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-6 text-blue-600">Connexion</h1>
         <input
           type="email"
           placeholder="Email"
-          className="w-full border p-3 rounded mb-3"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-3 border rounded-lg mb-3"
         />
         <input
           type="password"
           placeholder="Mot de passe"
-          className="w-full border p-3 rounded mb-4"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-3 border rounded-lg mb-3"
         />
-        {errorMsg && (
-          <p className="text-red-600 text-sm mb-4 text-center">{errorMsg}</p>
-        )}
+        {error && <p className="text-red-500 text-center mb-2">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
         >
-          Se connecter
+          {loading ? 'Connexion...' : 'Se connecter'}
         </button>
       </form>
-    </div>
+    </main>
   );
 }

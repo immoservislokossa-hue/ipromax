@@ -1,12 +1,12 @@
-// app/layout.tsx
 import type { Metadata, Viewport } from "next";
-import { Inter, Poppins } from "next/font/google";
-import "./globals.css";
+import { Poppins } from "next/font/google";
 
 import BottomNav from "./components/header/BottomNav";
 import Footer from "./components/Footer/Footer";
 import TopBar from "./components/header/TopBar";
 import InstallPrompt from "./components/PWA/InstallPrompt";
+
+import "./globals.css"; // tu peux le laisser si tu veux, mais ce n’est plus nécessaire pour la responsivité
 
 const poppins = Poppins({ 
   subsets: ["latin"], 
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/digital-logo.svg",
     shortcut: "/digital-logo.svg",
-    apple: "/icons/propulser.png", // ✅ Déjà défini ici pour iOS
+    apple: "/icons/propulser.png",
   },
   openGraph: {
     title: "Propulser - Plateforme digitale pour apprendre et créer",
@@ -51,15 +51,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ 
-  children 
-}: { 
-  children: React.ReactNode 
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <head>
-        {/* JSON-LD */}
+        {/* JSON-LD SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -76,17 +72,12 @@ export default function RootLayout({
             }),
           }}
         />
-        
-        {/* Favicon principal */}
         <link rel="icon" href="/digital-logo.svg" type="image/svg+xml" />
-        
-      
-        {/* Métadonnées iOS supplémentaires */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Propulser" />
-        
-        {/* Service Worker registration */}
+
+        {/* Service Worker */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -105,17 +96,24 @@ export default function RootLayout({
           }}
         />
       </head>
+
       <body 
-        className={`bg-[#F2F2FF] min-h-screen flex flex-col ${poppins.className}`} 
+        className={`bg-[#F2F2FF] flex flex-col min-h-screen overflow-x-hidden w-full max-w-[100vw] ${poppins.className}`} 
         suppressHydrationWarning
       >
-        <div className="flex min-h-screen flex-col">
+        <div className="flex flex-col min-h-screen w-full max-w-[100vw] mx-auto">
           <h1 className="sr-only">
             Propulser - Plateforme digitale pour formations, ebooks et outils digitaux
           </h1>
+
           <TopBar />
           <InstallPrompt />
-          <main className="flex-1">{children}</main>
+
+          {/* ✅ Section principale totalement responsive */}
+          <main className="flex-1 w-full max-w-[100vw] overflow-hidden px-4 sm:px-6 lg:px-8">
+            {children}
+          </main>
+
           <Footer />
           <BottomNav />
         </div>

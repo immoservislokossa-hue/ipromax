@@ -1,25 +1,34 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
+// ✅ Les routes protégées (ton dashboard)
+const PROTECTED_PATHS = ['/player']
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
+  const url = req.nextUrl.clone()
 
-  // 🔒 Si pas connecté, redirection vers /login
-  if (!session && req.nextUrl.pathname.startsWith('/player')) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    return NextResponse.redirect(redirectUrl);
+  // 🔓 Routes publiques → accès libre
+  if (!PROTECTED_PATHS.some(path => pathname.startsWith(path))) {
+    return NextResponse.next()
   }
 
-  return res;
+  // 🕵️ Vérifie si un token Supabase est présent
+  const accessToken = req.cookies.get('sb-access-token')?.value
+
+  // 🚫 Pas de token → redirection immédiate
+  if (!accessToken) {
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // ✅ Token présent → accès autorisé
+  return NextResponse.next()
 }
 
+// 🧭 Configuration du middleware
 export const config = {
-  matcher: ['/player/:path*'],
-};
+  matcher: [
+    '/player/:path*', // protège toutes les sous-routes de /player
+  ],
+}

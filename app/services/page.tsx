@@ -12,11 +12,11 @@ const ServicesPage = () => {
 
   const categories = [
     { id: "tous", name: "Tous les services" },
-    { id: "création", name: "🎨 Création IA" },
-    { id: "automatisation", name: "🤖 Automatisation" },
-    { id: "consulting", name: "🧠 Consulting & Formation" },
-    { id: "marketing", name: "📈 Marketing IA" },
-    { id: "data", name: "📊 Data & Analytics" },
+    { id: "création", name: "Création IA" },
+    { id: "automatisation", name: "Automatisation" },
+    { id: "consulting", name: "Consulting & Formation" },
+    { id: "marketing", name: "Marketing IA" },
+    { id: "data", name: "Data & Analytics" },
   ];
 
   const filteredServices = getServicesByCategory(activeCategory);
