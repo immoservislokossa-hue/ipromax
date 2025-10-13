@@ -29,9 +29,9 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+    <main className="min-h-screen flex items-center justify-center">
       <form onSubmit={handleLogin} className="bg-white shadow-lg rounded-2xl p-8 border border-gray-100 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-center mb-6 text-blue-600">Connexion</h1>
+        <h1 className="text-2xl font-bold text-center mb-6 text-blue-600">Connexion Utilisateur</h1>
         <input
           type="email"
           placeholder="Email"
