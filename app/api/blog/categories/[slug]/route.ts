@@ -1,32 +1,57 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs/route'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+// 📘 GET : Récupère tous les posts d’une catégorie donnée
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   const supabase = createRouteHandlerClient({ cookies })
 
-  const { data: posts, error } = await supabase
+  // Étape 1️⃣ : récupérer la catégorie via son slug
+  const { data: category, error: categoryError } = await supabase
+    .from('categories')
+    .select('id, name, slug')
+    .eq('slug', params.slug)
+    .single()
+
+  if (categoryError || !category) {
+    return NextResponse.json(
+      { error: 'Catégorie non trouvée' },
+      { status: 404 }
+    )
+  }
+
+  // Étape 2️⃣ : récupérer les posts liés à cette catégorie
+  const { data: posts, error: postsError } = await supabase
     .from('posts')
     .select(`
-      *,
-      categories (
-        name,
-        slug
-      ),
+      id,
+      title,
+      slug,
+      excerpt,
+      image_url,
+      created_at,
       authors (
         name,
         avatar_url
+      ),
+      categories (
+        name,
+        slug
       )
     `)
-    .eq('category_slug', params.slug)
+    .eq('category_id', category.id)
     .order('created_at', { ascending: false })
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (postsError) {
+    return NextResponse.json({ error: postsError.message }, { status: 500 })
   }
 
-  return NextResponse.json(posts)
+  // Réponse structurée
+  return NextResponse.json({
+    category,
+    posts,
+  })
 }

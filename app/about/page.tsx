@@ -4,50 +4,10 @@ import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BookOpen, Brain, ShoppingCart, Target, ArrowRight } from 'lucide-react';
-
-// ✅ SEO METADATA
-export const metadata = {
-  title: "À propos de Epropulse — IA, Formation & Services Digitaux",
-  description:
-    "Découvrez la mission et la vision d’Epropulse, première plateforme francophone de formation, consulting et services IA. Nous aidons les jeunes, créateurs et entreprises à propulser leur réussite grâce au digital.",
-  alternates: {
-    canonical: "https://www.epropulse.com/about",
-  },
-  openGraph: {
-    title: "À propos de Epropulse — IA, Formation & Services Digitaux",
-    description:
-      "Epropulse forme, automatise et propulse la réussite digitale grâce à l'intelligence artificielle, la data et la création de contenu.",
-    url: "https://www.epropulse.com/about",
-    siteName: "Epropulse",
-    images: [
-      {
-        url: "https://www.epropulse.com/og/epropulse-1200x630.png",
-        width: 1200,
-        height: 630,
-        alt: "Epropulse — Plateforme IA et digitale",
-      },
-    ],
-    type: "website",
-    locale: "fr_FR",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "À propos de Epropulse — IA, Formation & Services Digitaux",
-    description:
-      "Découvrez la mission et les services IA d’Epropulse, la plateforme qui aide les jeunes et entreprises à réussir avec le digital.",
-    images: ["https://www.epropulse.com/og/epropulse-1200x630.png"],
-    creator: "@epropulse",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    maxSnippet: -1,
-    maxImagePreview: "large",
-  },
-};
+import SEO from '@/components/Seo'; // ✅ Ton composant SEO réutilisable
 
 export default function AboutPage() {
-  // ✅ Animation
+  // 🎬 Animations
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -56,38 +16,43 @@ export default function AboutPage() {
       transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
     },
   };
-  const stagger: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.15 } } };
+  const stagger: Variants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.15 } },
+  };
 
   return (
-    <main className="min-h-screen bg-white text-gray-800">
-      {/* --- JSON-LD --- */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            name: "Epropulse",
-            url: "https://www.epropulse.com",
-            logo: "https://www.epropulse.com/digital-logo.svg",
-            sameAs: [
-              "https://facebook.com/epropulse",
-              "https://twitter.com/epropulse",
-              "https://linkedin.com/company/epropulse",
-            ],
-            description:
-              "Epropulse est la première plateforme francophone de formation, consulting et services IA. Elle aide jeunes, freelances et entreprises à réussir grâce au digital et à l'intelligence artificielle.",
-            foundingDate: "2024",
-            founder: {
-              "@type": "Person",
-              name: "Emmanuel Adjou",
-            },
-          }),
+    <main className=" text-gray-800">
+      {/* ✅ Composant SEO (remplace export const metadata) */}
+      <SEO
+        title="À propos de Epropulse — IA, Formation & Services Digitaux"
+        description="Découvrez la mission et la vision d’Epropulse, première plateforme francophone de formation, consulting et services IA. Nous aidons les jeunes, créateurs et entreprises à propulser leur réussite grâce au digital."
+        canonical="https://www.epropulse.com/about"
+        image="https://www.epropulse.com/og/epropulse-1200x630.png"
+        type="AboutPage"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Epropulse",
+          url: "https://www.epropulse.com",
+          logo: "https://www.epropulse.com/digital-logo.svg",
+          sameAs: [
+            "https://facebook.com/epropulse",
+            "https://twitter.com/epropulse",
+            "https://linkedin.com/company/epropulse",
+          ],
+          description:
+            "Epropulse est la première plateforme francophone de formation, consulting et services IA. Elle aide jeunes, freelances et entreprises à réussir grâce au digital et à l'intelligence artificielle.",
+          foundingDate: "2024",
+          founder: {
+            "@type": "Person",
+            name: "ADJOU Emmmanuel",
+          },
         }}
       />
 
       {/* 🌟 HERO */}
-      <section className="relative bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-24 md:py-28 rounded-b-[3rem] overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-600 to-blue-700 text-white py-24 md:py-28 rounded-b-[3rem] overflow-hidden">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -111,14 +76,17 @@ export default function AboutPage() {
             >
               <Image
                 src="/emmanueladjou.png"
-                alt="Emmanuel Adjou, fondateur d’Epropulse"
+                alt="Abdias A., fondateur d’Epropulse"
                 fill
                 className="object-cover"
               />
             </motion.div>
           </div>
 
-          <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4">
+          <motion.h1
+            variants={fadeUp}
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4"
+          >
             À propos de <span className="text-yellow-300">Epropulse</span>
           </motion.h1>
 
@@ -126,9 +94,10 @@ export default function AboutPage() {
             variants={fadeUp}
             className="text-base sm:text-lg md:text-xl max-w-3xl mx-auto text-blue-100"
           >
-            La première plateforme francophone dédiée à la <strong>formation</strong>, au{" "}
-            <strong>consulting</strong> et aux <strong>services IA</strong> pour
-            accompagner les jeunes, freelances et entreprises vers la réussite digitale.
+            <strong>Epropulse</strong> est une plateforme francophone dédiée à la{" "}
+            <strong>formation</strong>, au <strong>consulting</strong> et aux{" "}
+            <strong>services IA</strong>. Notre mission : propulser les jeunes,
+            freelances et entreprises vers la réussite digitale.
           </motion.p>
         </motion.div>
       </section>
@@ -165,7 +134,10 @@ export default function AboutPage() {
             </motion.div>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="bg-blue-50 rounded-3xl p-6 sm:p-8 shadow-sm text-center">
+          <motion.div
+            variants={fadeUp}
+            className="bg-blue-50 rounded-3xl p-6 sm:p-8 shadow-sm text-center"
+          >
             <Image
               src="/illustration-mission.png"
               alt="Mission et valeurs d’Epropulse"
@@ -227,7 +199,11 @@ export default function AboutPage() {
               <motion.div
                 key={i}
                 variants={fadeUp}
-                whileHover={{ y: -6, scale: 1.02, boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
+                whileHover={{
+                  y: -6,
+                  scale: 1.02,
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                }}
                 transition={{ type: 'spring', stiffness: 200 }}
                 className="bg-white rounded-3xl p-8 shadow-md border border-blue-100"
               >
@@ -285,10 +261,7 @@ export default function AboutPage() {
           >
             Prêt à propulser votre avenir digital ?
           </motion.h2>
-          <motion.p
-            variants={fadeUp}
-            className="text-blue-100 mb-10 max-w-2xl mx-auto"
-          >
+          <motion.p variants={fadeUp} className="text-blue-100 mb-10 max-w-2xl mx-auto">
             Rejoignez des centaines de créateurs et entrepreneurs qui apprennent, créent et grandissent avec Epropulse.
           </motion.p>
 

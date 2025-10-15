@@ -1,13 +1,14 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs/route'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+// 📘 GET : Récupère toutes les catégories
 export async function GET() {
   const supabase = createRouteHandlerClient({ cookies })
 
   const { data: categories, error } = await supabase
     .from('categories')
-    .select('*')
+    .select('id, name, slug, description, created_at, updated_at')
     .order('name', { ascending: true })
 
   if (error) {
@@ -17,20 +18,31 @@ export async function GET() {
   return NextResponse.json(categories)
 }
 
+// 🧩 POST : Crée une nouvelle catégorie
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies })
-  
-  const json = await request.json()
-  const { name, slug, description } = json
+  const body = await request.json()
+  const { name, slug, description } = body
 
+  // ✅ Validation de base
+  if (!name || !slug) {
+    return NextResponse.json(
+      { error: 'Les champs "name" et "slug" sont obligatoires.' },
+      { status: 400 }
+    )
+  }
+
+  // ✅ Insertion dans la table "categories"
   const { data, error } = await supabase
     .from('categories')
     .insert([
       {
         name,
         slug,
-        description
-      }
+        description,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
     ])
     .select()
     .single()

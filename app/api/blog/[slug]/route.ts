@@ -1,7 +1,8 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs/route'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+// 🧩 GET: Récupère un post unique selon le slug
 export async function GET(
   request: Request,
   { params }: { params: { slug: string } }
@@ -11,7 +12,13 @@ export async function GET(
   const { data: post, error } = await supabase
     .from('posts')
     .select(`
-      *,
+      id,
+      title,
+      slug,
+      content,
+      image_url,
+      created_at,
+      updated_at,
       categories (
         name,
         slug
@@ -35,14 +42,14 @@ export async function GET(
   return NextResponse.json(post)
 }
 
+// 🧩 PATCH: Met à jour un post
 export async function PATCH(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
   const supabase = createRouteHandlerClient({ cookies })
-  
-  const json = await request.json()
-  const { title, content, image_url, category_id } = json
+  const body = await request.json()
+  const { title, content, image_url, category_id } = body
 
   const { data, error } = await supabase
     .from('posts')
@@ -51,7 +58,7 @@ export async function PATCH(
       content,
       image_url,
       category_id,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     })
     .eq('slug', params.slug)
     .select()
@@ -64,6 +71,7 @@ export async function PATCH(
   return NextResponse.json(data)
 }
 
+// 🧩 DELETE: Supprime un post
 export async function DELETE(
   request: Request,
   { params }: { params: { slug: string } }
