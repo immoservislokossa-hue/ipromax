@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/app/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import BlogBannerHero from "@/app/components/BannerHero/BlogBannerHero";
 import VerticalProductList from "@/app/components/Produits/VerticalProductList";
@@ -75,9 +75,9 @@ interface CategoryStats {
 export default function BlogCategoryPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
@@ -89,11 +89,24 @@ export default function BlogCategoryPage({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearch] = useState("");
   const [total, setTotal] = useState(0);
+  const [resolvedParams, setResolvedParams] = useState<{ slug: string } | null>(null);
 
   const POSTS_PER_PAGE = 9;
 
-  // 🔍 Charger les articles de la catégorie spécifique depuis la vue published_blog_pposts
+  // Résoudre les params asynchrones
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolved = await params;
+      setResolvedParams(resolved);
+    };
+    
+    resolveParams();
+  }, [params]);
+
+  // 🔍 Charger les articles de la catégorie spécifique depuis la vue published_blog_posts
   const fetchCategoryPosts = async (page: number = 1, reset: boolean = false) => {
+    if (!resolvedParams) return;
+    
     try {
       if (reset) {
         setIsLoading(true);
@@ -103,7 +116,7 @@ export default function BlogCategoryPage({
       let query = supabase
         .from('published_blog_posts')
         .select('*', { count: 'exact' })
-        .eq('category_slug', params.slug)
+        .eq('category_slug', resolvedParams.slug)
         .order('published_at', { ascending: false });
 
       // Appliquer la recherche si spécifiée
@@ -139,11 +152,13 @@ export default function BlogCategoryPage({
 
   // 📥 Charger les informations de la catégorie depuis blog_categories
   const fetchCategory = async () => {
+    if (!resolvedParams) return;
+    
     try {
       const { data, error } = await supabase
         .from('blog_categories')
         .select('*')
-        .eq('slug', params.slug)
+        .eq('slug', resolvedParams.slug)
         .single();
 
       if (error) throw error;
@@ -156,11 +171,13 @@ export default function BlogCategoryPage({
 
   // 📊 Charger les statistiques de la catégorie
   const fetchCategoryStats = async () => {
+    if (!resolvedParams) return;
+    
     try {
       const { data: postsData, error: postsError } = await supabase
         .from('published_blog_posts')
         .select('views, content, published_at')
-        .eq('category_slug', params.slug);
+        .eq('category_slug', resolvedParams.slug);
 
       if (postsError) throw postsError;
 
@@ -209,13 +226,13 @@ export default function BlogCategoryPage({
 
   // 🔄 Effet principal de chargement
   useEffect(() => {
-    if (params.slug) {
+    if (resolvedParams) {
       fetchCategoryPosts(1, true);
       fetchCategory();
       fetchCategoryStats();
       fetchAllCategories();
     }
-  }, [params.slug, searchTerm]);
+  }, [resolvedParams, searchTerm]);
 
   // 🔍 Handlers de filtres et recherche
   const handleSearch = useCallback(
@@ -261,14 +278,14 @@ export default function BlogCategoryPage({
 
   // 🏷️ Génération des Structured Data pour la catégorie
   const generateCategorySchema = () => {
-    if (!category) return null;
+    if (!category || !resolvedParams) return null;
 
     const schema = {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       "name": category.name,
       "description": category.description || category.seo_description || `Collection d'articles sur ${category.name} - Epropulse`,
-      "url": `https://epropulse.com/blog/categorie/${category.slug}`,
+      "url": `https://epropulse.com/blog/categorie/${resolvedParams.slug}`,
       "mainEntity": {
         "@type": "ItemList",
         "numberOfItems": categoryStats?.post_count || 0,
@@ -313,6 +330,8 @@ export default function BlogCategoryPage({
 
   // 🏷️ Génération du Breadcrumb Schema
   const generateBreadcrumbSchema = () => {
+    if (!resolvedParams) return null;
+    
     const schema = {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -339,7 +358,7 @@ export default function BlogCategoryPage({
           "@type": "ListItem",
           "position": 4,
           "name": category?.name || "Catégorie",
-          "item": `https://epropulse.com/blog/categorie/${params.slug}`
+          "item": `https://epropulse.com/blog/categorie/${resolvedParams.slug}`
         }
       ]
     };
@@ -394,7 +413,7 @@ export default function BlogCategoryPage({
 
   // 🔍 Meta title et description dynamiques pour le head
   useEffect(() => {
-    if (category) {
+    if (category && resolvedParams) {
       const metaTitle = category.seo_title || `${category.name} - Articles et Guides | Epropulse`;
       const metaDescription = category.seo_description || 
         `Découvrez tous nos articles sur ${category.name}. ${category.description || `Expertise et conseils en ${category.name} pour votre croissance.`}`;
@@ -418,9 +437,21 @@ export default function BlogCategoryPage({
         canonical.setAttribute('rel', 'canonical');
         document.head.appendChild(canonical);
       }
-      canonical.setAttribute('href', `https://epropulse.com/blog/categorie/${category.slug}`);
+      canonical.setAttribute('href', `https://epropulse.com/blog/categorie/${resolvedParams.slug}`);
     }
-  }, [category]);
+  }, [category, resolvedParams]);
+
+  // Afficher un loading pendant la résolution des params
+  if (!resolvedParams) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F23E8] mx-auto mb-4"></div>
+          <p className="text-gray-500">Chargement de la catégorie...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (error && !category) {
     return (
@@ -486,7 +517,7 @@ export default function BlogCategoryPage({
           </button>
           <span aria-hidden="true">›</span>
           <span className="text-gray-900 font-medium" aria-current="page">
-            {category?.name || params.slug}
+            {category?.name || resolvedParams.slug}
           </span>
         </motion.nav>
 
@@ -534,14 +565,14 @@ export default function BlogCategoryPage({
                 </div>
                 <select
                   id="category-selector"
-                  value={params.slug}
+                  value={resolvedParams.slug}
                   onChange={handleCategoryChange}
                   className="w-full pl-12 pr-4 py-4 bg-white/90 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0F23E8]/30 focus:border-[#0F23E8] text-gray-800 font-medium transition-all duration-300 hover:border-[#0F23E8]/50 cursor-pointer shadow-sm appearance-none"
                   aria-label="Sélectionner une catégorie"
                 >
-                  <option value={params.slug}>{category?.name}</option>
+                  <option value={resolvedParams.slug}>{category?.name}</option>
                   {allCategories
-                    .filter(cat => cat.slug !== params.slug)
+                    .filter(cat => cat.slug !== resolvedParams.slug)
                     .map((cat) => (
                       <option key={cat.slug} value={cat.slug}>
                         {cat.name}
@@ -699,7 +730,7 @@ export default function BlogCategoryPage({
                         author_name={post.author_name}
                         views={post.views}
                         tags={post.tags}
-                        reading_time={calculateReadingTime(post.content)}
+                     
                       />
                     </motion.article>
                   ))}
@@ -761,7 +792,7 @@ export default function BlogCategoryPage({
                 <nav aria-label="Navigation des catégories">
                   <div className="space-y-2">
                     {allCategories
-                      .filter(cat => cat.slug !== params.slug)
+                      .filter(cat => cat.slug !== resolvedParams.slug)
                       .slice(0, 5)
                       .map((cat) => (
                         <button

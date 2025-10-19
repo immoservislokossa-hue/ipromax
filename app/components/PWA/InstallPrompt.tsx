@@ -1,54 +1,61 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Download } from 'lucide-react';
 
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const handler = (e: any) => {
+    const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
 
-      // Affiche le bouton 5 secondes après l'arrivée
-      const showTimeout = setTimeout(() => {
-        setIsVisible(true);
+      // ⏱ Afficher le bouton après 10 secondes
+      const show = setTimeout(() => setVisible(true), 10000);
 
-        // Le cache disparaît automatiquement 5 secondes après l'apparition
-        const hideTimeout = setTimeout(() => setIsVisible(false), 5000);
-        return () => clearTimeout(hideTimeout);
-      }, 5000);
-
-      return () => clearTimeout(showTimeout);
+      return () => clearTimeout(show);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
-
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
 
-  const handleInstallClick = async () => {
+  const handleInstall = async () => {
     if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === 'accepted') {
-      console.log('✅ App installée');
+
+    (deferredPrompt as any).prompt();
+    const { outcome } = await (deferredPrompt as any).userChoice;
+
+    if (outcome === 'accepted') {
+      console.log('✅ Application installée');
     } else {
       console.log('❌ Installation refusée');
     }
+
     setDeferredPrompt(null);
-    setIsVisible(false);
+    setVisible(false);
   };
 
   return (
-    isVisible && (
-      <button
-        onClick={handleInstallClick}
-        className="fixed bottom-20 right-4 bg-[#0F23E8] text-white px-4 py-2 rounded-xl shadow-lg transition-opacity duration-500"
-      >
-        Installer l’app 🚀
-      </button>
-    )
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          key="pwa-install"
+          onClick={handleInstall}
+          initial={{ opacity: 0, y: 80 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 80 }}
+          transition={{ duration: 0.4 }}
+          className="fixed bottom-6 right-6 flex items-center gap-2 bg-[#0F23E8] text-white font-medium px-5 py-3 rounded-2xl shadow-lg hover:bg-[#0916a8] transition-all"
+        >
+          <Download size={18} /> Installer l’app
+        </motion.button>
+      )}
+    </AnimatePresence>
   );
 }

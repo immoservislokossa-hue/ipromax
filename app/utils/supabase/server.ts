@@ -1,8 +1,31 @@
-import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 
-// Server-side Supabase client. Use only server-safe env vars.
-export const createServerSupabaseClient = () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  return createClient(url, key);
-};
+export const createServerSupabaseClient = async () => {
+  // ⏳ cookies() est désormais asynchrone en Next 15
+  const cookieStore = await cookies()
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: any) {
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch {
+            // certains contextes statiques ne permettent pas set()
+          }
+        },
+        remove(name: string, options: any) {
+          try {
+            cookieStore.set({ name, value: '', ...options, maxAge: 0 })
+          } catch {}
+        },
+      },
+    }
+  )
+}

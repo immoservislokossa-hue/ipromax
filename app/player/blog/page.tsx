@@ -27,7 +27,6 @@ import {
   FolderOpen,
   MessageSquare,
 } from 'lucide-react';
-import { useAuthRedirect } from '../../hooks/useAuthRedirect';
 
 interface Author {
   id: string;
@@ -131,8 +130,7 @@ export default function BlogListPage() {
   const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
   const [editingTag, setEditingTag] = useState<BlogTag | null>(null);
 
-  useAuthRedirect();
-
+ 
   // 🔹 Charger toutes les données
   useEffect(() => {
     const fetchData = async () => {
@@ -722,6 +720,7 @@ export default function BlogListPage() {
         <div className="flex items-center gap-2">
           <Filter size={18} className="text-gray-400" />
           <select
+            aria-label="Filtrer par catégorie"
             value={filterCat}
             onChange={(e) => setFilterCat(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-[#0F23E8] focus:border-[#0F23E8] transition-all duration-300"
@@ -738,6 +737,7 @@ export default function BlogListPage() {
         <div className="flex items-center gap-2">
           <Users size={18} className="text-gray-400" />
           <select
+            aria-label="Filtrer par auteur"
             value={filterAuthor}
             onChange={(e) => setFilterAuthor(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-[#0F23E8] focus:border-[#0F23E8] transition-all duration-300"
@@ -754,6 +754,7 @@ export default function BlogListPage() {
         <div className="flex items-center gap-2">
           <Hash size={18} className="text-gray-400" />
           <select
+            aria-label="Filtrer par tag"
             value={filterTag}
             onChange={(e) => setFilterTag(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-[#0F23E8] focus:border-[#0F23E8] transition-all duration-300"
@@ -770,6 +771,7 @@ export default function BlogListPage() {
         <div className="flex items-center gap-2">
           <FileText size={18} className="text-gray-400" />
           <select
+            aria-label="Filtrer par statut"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-[#0F23E8] focus:border-[#0F23E8] transition-all duration-300"
@@ -895,8 +897,10 @@ export default function BlogListPage() {
                 <button 
                   onClick={() => setShowStatsModal(false)}
                   className="text-gray-400 hover:text-gray-600 transition"
+                  aria-label="Fermer le modal statistiques"
+                  title="Fermer"
                 >
-                  <X size={24} />
+                  <X size={24} aria-hidden="true" />
                 </button>
               </div>
               
@@ -964,17 +968,20 @@ export default function BlogListPage() {
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">Gestion des Catégories ({categories.length})</h3>
                 <div className="flex gap-2">
-                  <button
+                  <button 
                     onClick={() => setShowCategoryModal(true)}
                     className="flex items-center gap-2 bg-[#0F23E8] hover:bg-[#0A1ACF] text-white px-4 py-2 rounded-lg transition-all duration-300"
+                    aria-label="Ajouter une nouvelle catégorie"
                   >
-                    <Plus size={16} /> Nouvelle
+                    <Plus size={16} aria-hidden="true" /> Nouvelle
                   </button>
                   <button 
                     onClick={() => setShowCategoryList(false)}
                     className="text-gray-400 hover:text-gray-600 transition"
+                    aria-label="Fermer la liste des catégories"
+                    title="Fermer"
                   >
-                    <X size={24} />
+                    <X size={24} aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -1026,17 +1033,20 @@ export default function BlogListPage() {
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-900">Gestion des Auteurs ({authors.length})</h3>
                 <div className="flex gap-2">
-                  <button
+                  <button 
                     onClick={() => setShowAuthorModal(true)}
                     className="flex items-center gap-2 bg-[#0F23E8] hover:bg-[#0A1ACF] text-white px-4 py-2 rounded-lg transition-all duration-300"
+                    aria-label="Ajouter un nouvel auteur"
                   >
-                    <Plus size={16} /> Nouveau
+                    <Plus size={16} aria-hidden="true" /> Nouveau
                   </button>
                   <button 
                     onClick={() => setShowAuthorList(false)}
                     className="text-gray-400 hover:text-gray-600 transition"
+                    aria-label="Fermer la liste des auteurs"
+                    title="Fermer"
                   >
-                    <X size={24} />
+                    <X size={24} aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -1091,14 +1101,17 @@ export default function BlogListPage() {
                   <button
                     onClick={() => setShowTagModal(true)}
                     className="flex items-center gap-2 bg-[#0F23E8] hover:bg-[#0A1ACF] text-white px-4 py-2 rounded-lg transition-all duration-300"
+                    aria-label="Ajouter un nouveau tag"
                   >
-                    <Plus size={16} /> Nouveau
+                    <Plus size={16} aria-hidden="true" /> Nouveau
                   </button>
                   <button 
                     onClick={() => setShowTagList(false)}
                     className="text-gray-400 hover:text-gray-600 transition"
+                    aria-label="Fermer la liste des tags"
+                    title="Fermer"
                   >
-                    <X size={24} />
+                    <X size={24} aria-hidden="true" />
                   </button>
                 </div>
               </div>

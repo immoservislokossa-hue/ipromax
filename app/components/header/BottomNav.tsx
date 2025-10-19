@@ -18,7 +18,7 @@ export default function BottomNav() {
   const [mounted, setMounted] = useState(false);
 
   const getActiveTab = () => {
-    if (pathname.startsWith('/products')) return 'boutique';
+    if (pathname.startsWith('/produits')) return 'boutique';
     if (pathname.startsWith('/blog')) return 'blog';
     if (pathname.startsWith('/services')) return 'services';
     if (pathname === '/') return 'home';
@@ -34,7 +34,7 @@ export default function BottomNav() {
 
   const navigationItems: NavigationItem[] = [
     { id: 'home', icon: Home, label: 'Accueil', href: '/' },
-    { id: 'boutique', icon: ShoppingBag, label: 'Boutique', href: '/products' },
+    { id: 'boutique', icon: ShoppingBag, label: 'Boutique', href: '/produits' },
     { id: 'blog', icon: BookOpen, label: 'Blog', href: '/blog' },
     { id: 'services', icon: Wrench, label: 'Services', href: '/services' },
   ];

@@ -1,13 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useAuthRedirect } from '../../../hooks/useAuthRedirect';
+import { createClient } from '@/app/utils/supabase/client';
 
 export default function NewProductPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
-  useAuthRedirect();
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -238,18 +236,23 @@ const Input = ({
   value,
   setProduct,
   type = 'text',
+  placeholder = ''
 }: {
   label: string;
   name: string;
   value: any;
   setProduct: any;
   type?: string;
+  placeholder?: string;
 }) => (
   <div>
-    <label className="block text-blue-700 font-semibold mb-1">{label}</label>
+    <label htmlFor={name} className="block text-blue-700 font-semibold mb-1">{label}</label>
     <input
+      id={name}
+      name={name}
       type={type}
       value={value}
+      placeholder={placeholder}
       onChange={(e) => setProduct((p: any) => ({ ...p, [name]: e.target.value }))}
       className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400"
     />
@@ -261,17 +264,22 @@ const Textarea = ({
   name,
   value,
   setProduct,
+  placeholder = ''
 }: {
   label: string;
   name: string;
   value: any;
   setProduct: any;
+  placeholder?: string;
 }) => (
   <div>
-    <label className="block text-blue-700 font-semibold mb-1">{label}</label>
+    <label htmlFor={name} className="block text-blue-700 font-semibold mb-1">{label}</label>
     <textarea
+      id={name}
+      name={name}
       rows={5}
       value={value}
+      placeholder={placeholder}
       onChange={(e) => setProduct((p: any) => ({ ...p, [name]: e.target.value }))}
       className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-400"
     />

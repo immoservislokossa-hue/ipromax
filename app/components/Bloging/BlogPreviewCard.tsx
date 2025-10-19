@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 
 interface BlogPreviewCardProps {
-  id: string;
+  id: string | number;
   slug: string;
   title: string;
   excerpt?: string;
@@ -12,6 +12,8 @@ interface BlogPreviewCardProps {
   published_at: string;
   category_name: string;
   author_name?: string;
+  views?: number;
+  tags?: string[];
 }
 
 const FALLBACK_IMAGE =

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '../utils/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
@@ -28,7 +28,7 @@ import {
 
 export default function EpropulseDashboard() {
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>({});
   const [products, setProducts] = useState<any[]>([]);
@@ -45,146 +45,113 @@ export default function EpropulseDashboard() {
   const [emails, setEmails] = useState<any[]>([]);
   const [blogStats, setBlogStats] = useState<any>({});
 
+  const fetchAll = async () => {
+    try {
+      // Regroupement des requêtes avec Promise.all pour des performances optimales
+      const [
+        { data: propulser },
+        { data: blog },
+        { data: published },
+        { data: authorsData },
+        { data: categoriesData },
+        { data: tagsData },
+        { data: blogStatsData },
+        { data: leadsData },
+        { data: intrusionData },
+        { data: loginData },
+        { data: loginAttemptsData },
+        { data: messagesData },
+        { data: messages2Data },
+        { data: emailsData },
+      ] = await Promise.all([
+        supabase.from('Propulser').select('*').order('created_at', { ascending: false }),
+        supabase.from('blog_posts').select('*').order('created_at', { ascending: false }),
+        supabase.from('published_blog_posts').select('*').order('published_at', { ascending: false }),
+        supabase.from('authors').select('*').order('created_at', { ascending: false }),
+        supabase.from('blog_categories').select('*').order('created_at', { ascending: false }),
+        supabase.from('blog_tags').select('*').order('created_at', { ascending: false }),
+        supabase.from('blog_admin_stats').select('*').single(),
+        supabase.from('leads').select('*').order('created_at', { ascending: false }),
+        supabase.from('intrusions').select('*').order('created_at', { ascending: false }),
+        supabase.from('login_logs').select('*').order('created_at', { ascending: false }),
+        supabase.from('login_attempts').select('*').order('last_attempt_at', { ascending: false }),
+        supabase.from('messagepro').select('*').order('created_at', { ascending: false }),
+        supabase.from('messages').select('*').order('created_at', { ascending: false }),
+        supabase.from('email').select('*').order('created_at', { ascending: false }),
+      ]);
+
+      // Calcul des statistiques
+      const totalRevenue = propulser?.reduce(
+        (sum, p) => sum + ((p.price || 0) * (p.purchase_count || 0)),
+        0
+      ) || 0;
+
+      const totalViews = blog?.reduce((sum, post) => sum + (post.views || 0), 0) || 0;
+      const publishedPosts = blog?.filter(post => post.is_published) || [];
+      const draftPosts = blog?.filter(post => !post.is_published) || [];
+
+      setStats({
+        totalProducts: propulser?.length || 0,
+        totalArticles: blog?.length || 0,
+        totalPublished: publishedPosts.length,
+        totalDrafts: draftPosts.length,
+        totalAuthors: authorsData?.length || 0,
+        totalCategories: categoriesData?.length || 0,
+        totalTags: tagsData?.length || 0,
+        totalLeads: leadsData?.length || 0,
+        totalIntrusions: intrusionData?.length || 0,
+        totalLoginAttempts: loginAttemptsData?.length || 0,
+        totalMessages: (messagesData?.length || 0) + (messages2Data?.length || 0),
+        totalEmails: emailsData?.length || 0,
+        totalRevenue,
+        totalViews,
+      });
+
+      setProducts(propulser || []);
+      setPosts(blog || []);
+      setPublishedPosts(published || []);
+      setAuthors(authorsData || []);
+      setCategories(categoriesData || []);
+      setTags(tagsData || []);
+      setLeads(leadsData || []);
+      setIntrusions(intrusionData || []);
+      setLoginLogs(loginData || []);
+      setLoginAttempts(loginAttemptsData || []);
+      setMessages(messagesData || []);
+      setEmails(emailsData || []);
+      setBlogStats(blogStatsData || {});
+    } catch (err) {
+      console.error('Erreur dashboard:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        // Produits
-        const { data: propulser } = await supabase
-          .from('Propulser')
-          .select('*')
-          .order('created_at', { ascending: false });
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
 
-        // Articles blog
-        const { data: blog } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Articles publiés
-        const { data: published } = await supabase
-          .from('published_blog_posts')
-          .select('*')
-          .order('published_at', { ascending: false });
-
-        // Auteurs
-        const { data: authorsData } = await supabase
-          .from('authors')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Catégories
-        const { data: categoriesData } = await supabase
-          .from('blog_categories')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Tags
-        const { data: tagsData } = await supabase
-          .from('blog_tags')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Statistiques blog
-        const { data: blogStatsData } = await supabase
-          .from('blog_admin_stats')
-          .select('*')
-          .single();
-
-        // Leads
-        const { data: leadsData } = await supabase
-          .from('leads')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Intrusions
-        const { data: intrusionData } = await supabase
-          .from('intrusions')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Logs de connexion
-        const { data: loginData } = await supabase
-          .from('login_logs')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Tentatives de connexion
-        const { data: loginAttemptsData } = await supabase
-          .from('login_attempts')
-          .select('*')
-          .order('last_attempt_at', { ascending: false });
-
-        // Messages (messagepro)
-        const { data: messagesData } = await supabase
-          .from('messagepro')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Messages (messages)
-        const { data: messages2Data } = await supabase
-          .from('messages')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Emails
-        const { data: emailsData } = await supabase
-          .from('email')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        // Calcul des statistiques
-        const totalRevenue = propulser?.reduce(
-          (sum, p) => sum + ((p.price || 0) * (p.purchase_count || 0)),
-          0
-        ) || 0;
-
-        const totalViews = blog?.reduce((sum, post) => sum + (post.views || 0), 0) || 0;
-        const publishedPosts = blog?.filter(post => post.is_published) || [];
-        const draftPosts = blog?.filter(post => !post.is_published) || [];
-
-        setStats({
-          totalProducts: propulser?.length || 0,
-          totalArticles: blog?.length || 0,
-          totalPublished: publishedPosts.length,
-          totalDrafts: draftPosts.length,
-          totalAuthors: authorsData?.length || 0,
-          totalCategories: categoriesData?.length || 0,
-          totalTags: tagsData?.length || 0,
-          totalLeads: leadsData?.length || 0,
-          totalIntrusions: intrusionData?.length || 0,
-          totalLoginAttempts: loginAttemptsData?.length || 0,
-          totalMessages: (messagesData?.length || 0) + (messages2Data?.length || 0),
-          totalEmails: emailsData?.length || 0,
-          totalRevenue,
-          totalViews,
-        });
-
-        setProducts(propulser || []);
-        setPosts(blog || []);
-        setPublishedPosts(published || []);
-        setAuthors(authorsData || []);
-        setCategories(categoriesData || []);
-        setTags(tagsData || []);
-        setLeads(leadsData || []);
-        setIntrusions(intrusionData || []);
-        setLoginLogs(loginData || []);
-        setLoginAttempts(loginAttemptsData || []);
-        setMessages(messagesData || []);
-        setEmails(emailsData || []);
-        setBlogStats(blogStatsData || {});
-      } catch (err) {
-        console.error('Erreur dashboard:', err);
-      } finally {
-        setLoading(false);
+      if (!session) {
+        router.replace('/login')
+        return
       }
-    };
 
-    fetchAll();
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
+      if (adminEmail && session.user.email !== adminEmail) {
+        await supabase.auth.signOut()
+        router.replace('/login')
+        return
+      }
+
+      fetchAll()
+    }
+
+    checkAuth()
   }, [supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.replace('/secure-login');
+    router.replace('/login'); // Changement de /secure-login vers /login
   };
 
   if (loading) {
@@ -585,61 +552,6 @@ export default function EpropulseDashboard() {
                 ))}
               </tbody>
             </table>
-          </div>
-        </section>
-
-        {/* Logs de Sécurité */}
-        <section className="bg-white border rounded-lg shadow">
-          <h2 className="text-lg font-semibold border-b px-6 py-4">Logs de Sécurité</h2>
-          <div className="grid md:grid-cols-3 gap-6 p-6">
-            <div>
-              <h3 className="font-medium mb-3 flex items-center gap-2 text-blue-600">
-                <FaServer /> Connexions ({loginLogs.length})
-              </h3>
-              <ul className="space-y-2 text-sm">
-                {loginLogs.slice(0, 5).map((log) => (
-                  <li key={log.id} className="p-3 bg-gray-50 rounded border">
-                    <p className={log.success ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
-                      {log.email || 'Utilisateur inconnu'} — {log.success ? '✅ Succès' : '❌ Échec'}
-                    </p>
-                    <p className="text-gray-500 text-xs mt-1">{log.ip}</p>
-                    <p className="text-gray-400 text-xs">{log.path}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium mb-3 flex items-center gap-2 text-red-600">
-                <FaShieldAlt /> Intrusions ({intrusions.length})
-              </h3>
-              <ul className="space-y-2 text-sm">
-                {intrusions.slice(0, 5).map((intrusion) => (
-                  <li key={intrusion.id} className="p-3 bg-red-50 rounded border">
-                    <p className="text-red-800 font-medium">{intrusion.ip}</p>
-                    <p className="text-gray-500 text-xs mt-1 truncate">{intrusion.user_agent}</p>
-                    <p className="text-gray-400 text-xs">{intrusion.path}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium mb-3 flex items-center gap-2 text-orange-600">
-                <FaServer /> Tentatives de Connexion ({loginAttempts.length})
-              </h3>
-              <ul className="space-y-2 text-sm">
-                {loginAttempts.slice(0, 5).map((attempt) => (
-                  <li key={attempt.id} className="p-3 bg-orange-50 rounded border">
-                    <p className="text-orange-800 font-medium">{attempt.ip}</p>
-                    <p className="text-gray-500 text-xs mt-1">
-                      Tentatives: <strong>{attempt.attempts}</strong>
-                    </p>
-                    <p className="text-gray-400 text-xs">
-                      {attempt.blocked_until ? '🔒 Bloqué' : '✅ Actif'}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </section>
 

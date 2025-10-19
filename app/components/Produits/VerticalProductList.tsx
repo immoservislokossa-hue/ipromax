@@ -8,10 +8,16 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "./ProductCard"; // ✅ on réutilise ton interface
 
+interface VerticalProductListProps {
+  limit?: number;
+  compact?: boolean;
+  showViewAll?: boolean;
+}
+
 const FALLBACK_IMAGE =
   "https://images.pexels.com/photos/34123134/pexels-photo-34123134.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&dpr=1";
 
-export default function VerticalProductList() {
+export default function VerticalProductList({ limit = 5, compact = false, showViewAll = false }: VerticalProductListProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +30,7 @@ export default function VerticalProductList() {
           .from("Propulser") // ta table produits
           .select("*")
           .order("created_at", { ascending: false }) // ✅ plus récents d'abord
-          .limit(5);
+    .limit(limit);
 
         if (error) throw error;
         setProducts(data || []);

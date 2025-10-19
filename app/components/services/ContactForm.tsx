@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/app/utils/supabase/client';
 import { services } from '@/app/services/data/services';
 import { 
   User, 
@@ -34,7 +34,7 @@ interface ContactFormData {
 }
 
 export default function ContactForm() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const searchParams = useSearchParams();
   const serviceParam = searchParams.get('service') || '';
 

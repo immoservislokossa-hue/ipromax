@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/app/utils/supabase/client";
 import BlogBannerHero from "@/app/components/BannerHero/BlogBannerHero";
 import VerticalProductList from "@/app/components/Produits/VerticalProductList";
 import {
@@ -68,7 +68,7 @@ interface BlogStats {
 
 // 🧩 Composant principal
 export default function BlogPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [stats, setStats] = useState<BlogStats | null>(null);
@@ -232,13 +232,13 @@ export default function BlogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen">
       {/* === HERO === */}
       <div className="pt-8 pb-12">
         <BlogBannerHero />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 pb-20">
+      <div className="max-w-7xl mx-auto px-2 pb-20">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* === ZONE ARTICLES === */}
           <div className="flex-1">

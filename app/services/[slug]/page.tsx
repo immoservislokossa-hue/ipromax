@@ -13,27 +13,16 @@ import {
   Brain, 
   TrendingUp, 
   BarChart3,
-  MessageCircle,
   Phone,
   ShieldCheck,
   Sparkles,
-  Lightbulb,
   Rocket,
   Target,
-  Users,
-  Star,
-  Calendar,
-  FileText,
   Globe,
-  Award,
-  Heart,
-  Languages
 } from 'lucide-react';
 
 interface Props {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
@@ -43,6 +32,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props) {
+  // ⚡ Résoudre la promesse des params
   const { slug } = await params;
   const service = getServiceBySlug(slug);
   
@@ -128,136 +118,6 @@ export async function generateMetadata({ params }: Props) {
   };
 }
 
-// Schema.org Structured Data avec image optimisée
-function ServiceSchema({ service }: { service: any }) {
-  const categoryName = categories.find(c => c.id === service.category)?.name;
-  
-  const francophoneCountries = [
-    'FR', 'CA', 'BE', 'CH', 'LU',
-    'MA', 'TN', 'DZ', 'SN', 'CI', 'CM', 'CD', 'MG',
-    'HT', 'RE', 'MQ', 'GP', 'VU', 'NC'
-  ];
-  
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    'name': service.title,
-    'description': service.description,
-    'image': service.image, // Image ajoutée au schema principal
-    'provider': {
-      '@type': 'Organization',
-      'name': 'Epropulse',
-      'url': 'https://epropulse.com',
-      'logo': 'https://epropulse.com/logo.png',
-      'description': 'Solutions d\'intelligence artificielle pour la transformation digitale mondiale',
-      'areaServed': francophoneCountries,
-      'knowsAbout': ['IA', 'Intelligence Artificielle', 'Machine Learning', 'Transformation Digitale']
-    },
-    'serviceType': categoryName,
-    'category': service.category,
-    'areaServed': {
-      '@type': 'Country',
-      'name': 'Monde Francophone'
-    },
-    'availableChannel': {
-      '@type': 'ServiceChannel',
-      'serviceUrl': `https://epropulse.com/services/${service.slug}`,
-      'serviceLocation': {
-        '@type': 'VirtualLocation',
-        'name': 'Service en ligne mondial'
-      }
-    },
-    'hasOfferCatalog': {
-      '@type': 'OfferCatalog',
-      'name': 'Services IA International',
-      'itemListElement': service.features.map((feature: string, index: number) => ({
-        '@type': 'Offer',
-        'itemOffered': {
-          '@type': 'Service',
-          'name': feature,
-          'availableAtOrFrom': {
-            '@type': 'VirtualLocation',
-            'name': 'En ligne - Monde entier'
-          }
-        }
-      }))
-    },
-    ...(service.price && {
-      'offers': {
-        '@type': 'Offer',
-        'price': service.price.startingFrom,
-        'priceCurrency': service.price.currency,
-        'priceSpecification': {
-          '@type': 'UnitPriceSpecification',
-          'price': service.price.startingFrom,
-          'priceCurrency': service.price.currency,
-          'unitCode': service.price.unit || 'ACT'
-        },
-        'availability': 'https://schema.org/InStock',
-        'validFrom': new Date().toISOString().split('T')[0],
-        'areaServed': francophoneCountries,
-        'availableDeliveryMethod': 'https://schema.org/OnlineService'
-      }
-    }),
-    'additionalProperty': [
-      ...(service.tags?.map((tag: string) => ({
-        '@type': 'PropertyValue',
-        'name': 'tag',
-        'value': tag
-      })) || [])
-    ]
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-function BreadcrumbSchema({ service }: { service: any }) {
-  const categoryName = categories.find(c => c.id === service.category)?.name;
-  
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    'itemListElement': [
-      {
-        '@type': 'ListItem',
-        'position': 1,
-        'name': 'Accueil',
-        'item': 'https://epropulse.com'
-      },
-      {
-        '@type': 'ListItem',
-        'position': 2,
-        'name': 'Services IA International',
-        'item': 'https://epropulse.com/services'
-      },
-      {
-        '@type': 'ListItem',
-        'position': 3,
-        'name': categoryName,
-        'item': `https://epropulse.com/services?category=${service.category}`
-      },
-      {
-        '@type': 'ListItem',
-        'position': 4,
-        'name': service.title,
-        'item': `https://epropulse.com/services/${service.slug}`
-      }
-    ]
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
 function FAQSchema({ service }: { service: any }) {
   const faqItems = [
     {
@@ -292,6 +152,7 @@ function FAQSchema({ service }: { service: any }) {
 }
 
 const ServiceDetailPage = async ({ params }: Props) => {
+  // ⚡ Résoudre la promesse des params
   const { slug } = await params;
   const service = getServiceBySlug(slug);
 
@@ -328,17 +189,8 @@ const ServiceDetailPage = async ({ params }: Props) => {
   const CategoryIcon = getCategoryIcon(service.category);
   const categoryName = categories.find(c => c.id === service.category)?.name;
 
-  const francophoneRegions = [
-    { name: 'Europe', countries: ['France', 'Belgique', 'Suisse', 'Luxembourg'] },
-    { name: 'Amérique', countries: ['Canada (Québec)', 'Haïti'] },
-    { name: 'Afrique', countries: ['Maroc', 'Tunisie', 'Algérie', 'Sénégal', 'Côte d\'Ivoire'] }
-  ];
-
   return (
-    <div className="min-h-screen ">
-      {/* Structured Data */}
-      <ServiceSchema service={service} />
-      <BreadcrumbSchema service={service} />
+    <div className="min-h-screen">
       <FAQSchema service={service} />
 
       {/* Header */}
@@ -400,15 +252,13 @@ const ServiceDetailPage = async ({ params }: Props) => {
                   </div>
                  
                   {/* H1 - Titre principal */}
-                  <h2 className="text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight">
+                  <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight">
                     {service.title}
-                  </h2>
+                  </h1>
                   <p className="text-xl text-blue-100 leading-relaxed max-w-3xl">
                     {service.description}
                   </p>
                 </div>
-                
-              
               </div>
             </div>
           </div>

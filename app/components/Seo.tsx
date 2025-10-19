@@ -1,5 +1,8 @@
-// components/SEO.tsx
 import Head from 'next/head';
+
+interface Author {
+  name: string;
+}
 
 interface SEOProps {
   title?: string;
@@ -10,13 +13,14 @@ interface SEOProps {
   publishedTime?: string;
   modifiedTime?: string;
   noIndex?: boolean;
-  keywords?: string;
+  keywords?: string | null;
   schema?: Record<string, any>;
+  authors?: Author | Author[] | null;
 }
 
 export default function SEO({
   title = 'Epropulse – IA & Digital accessibles à tous',
-  description = 'Epropulse aide les créateurs, entrepreneurs et entreprises francophones à utiliser l’IA et le digital pour accélérer leur croissance, même sans compétences techniques.',
+  description = 'Epropulse aide les créateurs, entrepreneurs et entreprises francophones à utiliser l\'IA et le digital pour accélérer leur croissance, même sans compétences techniques.',
   canonical = 'https://www.epropulse.com',
   image = 'https://www.epropulse.com/og-default.jpg',
   type = 'website',
@@ -25,6 +29,7 @@ export default function SEO({
   noIndex = false,
   keywords,
   schema,
+  authors,
 }: SEOProps) {
   const fullTitle = title.includes('Epropulse') ? title : `${title} | Epropulse`;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/app/utils/supabase/client';
 import DOMPurify from 'dompurify';
 import {
   FiMail,
@@ -13,7 +13,7 @@ import {
 import SEO from '@/components/Seo'; // ton composant SEO réutilisable
 
 export default function ContactPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   const [formData, setFormData] = useState({
     name: '',

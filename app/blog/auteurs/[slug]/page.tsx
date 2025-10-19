@@ -1,13 +1,20 @@
+// app/blog/auteurs/[slug]/page.tsx
+"use client";
+
+import { useState, useEffect } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { createServerSupabaseClient } from "@/app/utils/supabase/server";
+import { createClient } from "@/app/utils/supabase/client";
 
 // --- Config
-export const revalidate = 3600;
 const SITE_URL = "https://epropulse.com";
 const SITE_NAME = "Epropulse";
+
+// Image Unsplash de fallback pour les avatars
+const UNSPLASH_AVATAR_FALLBACK = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80";
+const UNSPLASH_COVER_FALLBACK = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80";
 
 // --- Types
 type Author = {
@@ -20,6 +27,15 @@ type Author = {
   created_at: string;
 };
 
+type BlogPost = {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  cover_image: string | null;
+  published_at: string;
+};
+
 // --- Utils
 function slugify(name: string) {
   return name
@@ -30,96 +46,111 @@ function slugify(name: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-// --- Data Fetching (Server Side)
-async function getAuthorData(slug: string) {
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase.from("authors").select("*");
-  const author = data?.find((a) => slugify(a.name) === slug) || null;
-  if (!author) return null;
-
-  const { data: posts } = await supabase
-    .from("blog_posts")
-    .select("id, slug, title, excerpt, cover_image, published_at")
-    .eq("author_id", author.id)
-    .eq("is_published", true)
-    .order("published_at", { ascending: false })
-    .limit(6);
-
-  return { author, posts: posts || [] };
-}
-
-// --- Static params for prebuild
-export async function generateStaticParams() {
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase.from("authors").select("name");
-  return data?.map((a) => ({ slug: slugify(a.name) })) || [];
-}
-
-// --- Metadata SEO
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params; // ✅ correction : params est asynchrone
-  const result = await getAuthorData(slug);
-  if (!result) {
-    return {
-      title: "Auteur introuvable — Epropulse",
-      description: "Profil non trouvé",
-      robots: { index: false, follow: false },
-    };
+// Fonction pour valider les URLs d'images
+function getSafeImageUrl(url: string | null, fallback: string): string {
+  if (!url || url.trim() === '') {
+    return fallback;
   }
-
-  const { author } = result;
-  const url = `${SITE_URL}/blog/auteurs/${slug}`;
-  const desc =
-    author.bio ||
-    `Profil, articles et expertise de ${author.name} sur ${SITE_NAME}.`;
-
-  return {
-    title: `${author.name} — Auteur sur ${SITE_NAME}`,
-    description: desc,
-    alternates: { canonical: url },
-    openGraph: {
-      title: `${author.name} — Auteur sur ${SITE_NAME}`,
-      description: desc,
-      url,
-      siteName: SITE_NAME,
-      type: "profile",
-      locale: "fr_FR",
-      images: author.avatar
-        ? [{ url: author.avatar, width: 600, height: 600, alt: author.name }]
-        : [],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: author.name,
-      description: desc,
-      images: author.avatar ? [author.avatar] : [],
-    },
-    robots: {
-      index: true,
-      follow: true,
-      maxSnippet: -1,
-      maxImagePreview: "large",
-      maxVideoPreview: -1,
-    },
-  };
+  
+  try {
+    new URL(url);
+    return url;
+  } catch {
+    return fallback;
+  }
 }
 
 // --- Component principal
-export default async function AuthorPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params; // ✅ correction : params est asynchrone
-  const result = await getAuthorData(slug);
-  if (!result) return notFound();
+export default function AuthorPage({ params }: { params: Promise<{ slug: string }> }) {
+  const [author, setAuthor] = useState<Author | null>(null);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [slug, setSlug] = useState<string>("");
 
-  const { author, posts } = result;
+  useEffect(() => {
+    async function loadParams() {
+      const resolvedParams = await params;
+      setSlug(resolvedParams.slug);
+    }
+    loadParams();
+  }, [params]);
+
+  useEffect(() => {
+    async function fetchAuthorData() {
+      if (!slug) return;
+
+      try {
+        setLoading(true);
+        const supabase = createClient();
+        
+        // Get all authors
+        const { data: authors, error: authorsError } = await supabase
+          .from("authors")
+          .select("*");
+
+        if (authorsError) {
+          console.error("Error fetching authors:", authorsError);
+          return;
+        }
+
+        if (!authors || authors.length === 0) {
+          return;
+        }
+
+        const foundAuthor = authors.find((a) => slugify(a.name) === slug) || null;
+        
+        if (!foundAuthor) {
+          return;
+        }
+
+        setAuthor(foundAuthor);
+
+        // Get author's posts
+        const { data: postsData, error: postsError } = await supabase
+          .from("blog_posts")
+          .select("id, slug, title, excerpt, cover_image, published_at")
+          .eq("author_id", foundAuthor.id)
+          .eq("is_published", true)
+          .order("published_at", { ascending: false })
+          .limit(6);
+
+        if (postsError) {
+          console.error("Error fetching posts:", postsError);
+          setPosts([]);
+        } else {
+          setPosts(postsData || []);
+        }
+      } catch (error) {
+        console.error("Error in fetchAuthorData:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAuthorData();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/20 py-10">
+        <div className="max-w-5xl mx-auto bg-white/90 border border-slate-200 rounded-2xl p-8 shadow-sm">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-32 h-32 rounded-full bg-slate-200 mb-6 border-4 border-white shadow-sm animate-pulse" />
+            <div className="h-8 bg-slate-200 rounded w-48 mb-2 animate-pulse" />
+            <div className="h-4 bg-slate-200 rounded w-32 mb-4 animate-pulse" />
+            <div className="h-20 bg-slate-200 rounded w-full max-w-2xl animate-pulse" />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (!author) {
+    return notFound();
+  }
+
   const url = `${SITE_URL}/blog/auteurs/${slug}`;
+  const authorAvatar = getSafeImageUrl(author.avatar, UNSPLASH_AVATAR_FALLBACK);
 
   // --- JSON-LD Schema
   const person = {
@@ -128,10 +159,10 @@ export default async function AuthorPage({
     "@id": `${url}#author`,
     name: author.name,
     description: author.bio || undefined,
-    image: author.avatar || `${SITE_URL}/default-avatar.png`, // ✅ fallback image
+    image: authorAvatar,
     jobTitle: author.role || undefined,
     url,
-    sameAs: author.social_links ? Object.values(author.social_links) : [],
+    sameAs: author.social_links ? Object.values(author.social_links).filter(Boolean) : [],
   };
 
   const breadcrumb = {
@@ -162,10 +193,12 @@ export default async function AuthorPage({
         <div className="flex flex-col items-center text-center">
           <div className="relative w-32 h-32 rounded-full overflow-hidden bg-slate-200 mb-6 border-4 border-white shadow-sm">
             <Image
-              src={author.avatar || "/default-avatar.png"} // ✅ fallback local
-              alt={author.name}
+              src={authorAvatar}
+              alt={`Avatar de ${author.name}`}
               fill
               className="object-cover"
+              priority
+              sizes="128px"
             />
           </div>
 
@@ -180,19 +213,21 @@ export default async function AuthorPage({
           )}
 
           {/* Social links */}
-          {author.social_links && (
-            <div className="flex gap-4 mt-6">
-              {Object.entries(author.social_links).map(([platform, link]) => (
-                <a
-                  key={platform}
-                  href={String(link)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-slate-500 hover:text-blue-600 text-sm capitalize"
-                >
-                  {platform}
-                </a>
-              ))}
+          {author.social_links && Object.keys(author.social_links).length > 0 && (
+            <div className="flex gap-4 mt-6 flex-wrap justify-center">
+              {Object.entries(author.social_links)
+                .filter(([_, link]) => link && typeof link === 'string')
+                .map(([platform, link]) => (
+                  <a
+                    key={platform}
+                    href={link as string}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-slate-500 hover:text-blue-600 text-sm capitalize bg-slate-100 px-3 py-1 rounded-full transition-colors"
+                  >
+                    {platform}
+                  </a>
+                ))}
             </div>
           )}
         </div>
@@ -203,46 +238,49 @@ export default async function AuthorPage({
             Articles récents de {author.name}
           </h2>
 
-          {!posts.length ? (
+          {!posts || posts.length === 0 ? (
             <p className="text-slate-500 text-sm">
               Aucun article publié pour le moment.
             </p>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {posts.map((p) => (
-                <li key={p.id}>
-                  <Link
-                    href={`/blog/${p.slug}`}
-                    className="block border border-slate-200 rounded-xl p-4 hover:shadow-md transition-all duration-200"
-                  >
-                    {p.cover_image && (
+              {posts.map((post) => {
+                const postCover = getSafeImageUrl(post.cover_image, UNSPLASH_COVER_FALLBACK);
+                
+                return (
+                  <li key={post.id} className="group">
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="block border border-slate-200 rounded-xl p-4 hover:shadow-md transition-all duration-200 group-hover:border-blue-200"
+                    >
                       <div className="relative w-full h-40 rounded-lg overflow-hidden mb-3 bg-slate-100">
                         <Image
-                          src={p.cover_image}
-                          alt={p.title}
+                          src={postCover}
+                          alt={post.title}
                           fill
-                          className="object-cover"
+                          className="object-cover group-hover:scale-105 transition-transform duration-200"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       </div>
-                    )}
-                    <h3 className="font-semibold text-slate-900 mb-1">
-                      {p.title}
-                    </h3>
-                    {p.excerpt && (
-                      <p className="text-slate-600 text-sm line-clamp-2">
-                        {p.excerpt}
+                      <h3 className="font-semibold text-slate-900 mb-1 line-clamp-2">
+                        {post.title}
+                      </h3>
+                      {post.excerpt && (
+                        <p className="text-slate-600 text-sm line-clamp-2 mb-2">
+                          {post.excerpt}
+                        </p>
+                      )}
+                      <p className="text-xs text-slate-400">
+                        {new Date(post.published_at).toLocaleDateString("fr-FR", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
                       </p>
-                    )}
-                    <p className="text-xs text-slate-400 mt-1">
-                      {new Date(p.published_at).toLocaleDateString("fr-FR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </Link>
-                </li>
-              ))}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
@@ -251,7 +289,7 @@ export default async function AuthorPage({
         <div className="mt-10 text-center">
           <Link
             href="/blog/auteurs"
-            className="text-blue-600 hover:text-blue-800 text-sm underline"
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm underline transition-colors"
           >
             ← Retour à la liste des auteurs
           </Link>

@@ -73,16 +73,7 @@ export default function HomePage() {
         </Suspense>
       </div>
 
-      {/* 🔹 CTA juste sous le Hero (espacement réduit) */}
-      <div className="text-center mt-3 md:mt-4">
-        <Link
-          href="/produits"
-          className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl shadow-md hover:shadow-xl transition-all duration-300"
-        >
-          <Sparkles className="mr-2 text-yellow-300" /> Explorer les produits phares
-        </Link>
-      </div>
-
+      
       {/* 🔹 Section Qui sommes-nous ? */}
       <section className="container mx-auto px-4 md:px-6 py-8 space-y-4 text-center md:text-left mt-8 md:mt-10">
         <motion.div
@@ -90,13 +81,13 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="bg-white/70 backdrop-blur-md border border-blue-100 rounded-2xl shadow-md p-6 md:p-8 mx-auto"
+          className="   p-2 md:p-2 mx-auto"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-[#0F23E8] mb-3 text-center">Qui sommes-nous ?</h2>
-          <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl md:text-4xl font-bold text-[#0F23E8] mb-2 text-center">Qui sommes-nous ?</h2>
+          <h3 className="text-gray-700 text-md leading-relaxed max-w-2xl mx-auto text-center">
             Propulser est une plateforme digitale dédiée à la croissance des créateurs, coachs, formateurs et entrepreneurs.
             Notre mission est de rendre la réussite accessible à tous, grâce à des outils, formations et ressources numériques puissants.
-          </p>
+          </h3>
           <div className="flex justify-center mt-5">
             <Link
               href="/about"

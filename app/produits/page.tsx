@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/app/utils/supabase/client';
 import ProductGrid from '@/components/Produits/ProductGrid';
 import SearchFilters from '@/components/header/SearchFilters';
 import DOMPurify from 'dompurify';
@@ -37,7 +37,7 @@ export interface Product {
 }
 
 export default function ProductsPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

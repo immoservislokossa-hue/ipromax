@@ -1,11 +1,11 @@
 "use client";
 
 import ContactForm from "@/app/components/services/ContactForm";
-import Link from "next/link";
+
 import { useSearchParams, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+
 import { services } from "@/app/services/data/services";
 
 export default function ClientCommandesPage() {
