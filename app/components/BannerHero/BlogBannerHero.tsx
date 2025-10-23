@@ -16,50 +16,27 @@ interface Slide {
 }
 
 const slides: Slide[] = [
-
-    {
-    imageDesktop: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
-    imageMobile: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    alt: 'Services IA - E-Propulse Consulting',
-    title: 'Solutions IA pour Entreprises',
-    subtitle: 'Transformez vos données en avantage compétitif',
-    description: 'Consulting IA, analyse de données avancée, automation intelligente. Bénéficiez de notre expertise pour accélérer votre transformation digitale.',
-    ctaText: 'Découvrir nos services',
-    ctaHref: '/services',
+  {
+    imageDesktop: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
+    imageMobile: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    alt: 'Blog Propulser - Ressources et articles',
+    title: 'Explorez nos articles',
+    subtitle: 'Découvrez, apprenez, évoluez',
+    description: 'Une collection d\'articles, de guides et de ressources pour vous aider à développer vos compétences et réussir dans votre parcours professionnel.',
+    ctaText: 'Découvrir les articles',
+    ctaHref: '#articles',
   },
-   {
-    imageDesktop: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
-    imageMobile: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    alt: 'Formation Tech - Boutique E-Propulse',
-    title: 'Boostez Votre Apprentissage',
-    subtitle: 'Ressources premium et formations certifiantes',
-    description: 'Accédez à notre boutique exclusive : abonnements premium, outils IA, templates professionnels et formations pour maîtriser les technologies de demain.',
-    ctaText: 'Visiter la boutique',
-    ctaHref: '/produits',
+  {
+    imageDesktop: 'https://images.unsplash.com/photo-1456324504439-367cee3b3c32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
+    imageMobile: 'https://images.unsplash.com/photo-1456324504439-367cee3b3c32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    alt: 'Tutoriels et guides pratiques',
+    title: 'Guides pratiques',
+    subtitle: 'Apprenez par la pratique',
+    description: 'Des tutoriels détaillés et des guides pratiques pour maîtriser de nouvelles compétences et techniques.',
+    ctaText: 'Voir les guides',
+    ctaHref: '/blog/category/tutoriels',
   }
-,
-  {
-    imageDesktop: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
-    imageMobile: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    alt: 'Intelligence Artificielle - Blog E-Propulse',
-    title: 'L\'IA Révolutionne Notre Monde',
-    subtitle: 'Décryptage des dernières avancées',
-    description: 'Plongez dans l\'univers fascinant de l\'intelligence artificielle. Analyses approfondies, tendances émergentes et impacts sociétaux.',
-    ctaText: 'Explorer l\'IA',
-    ctaHref: '/blog',
-  },
-  {
-    imageDesktop: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
-    imageMobile: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    alt: 'Technologies Emergentes - E-Propulse',
-    title: 'Futur Tech & Innovations',
-    subtitle: 'Anticipez les prochaines ruptures',
-    description: 'Blockchain, Quantum Computing, IoT... Découvrez comment les technologies émergentes transforment les industries et créent de nouvelles opportunités.',
-    ctaText: 'Voir les tendances',
-    ctaHref: '/blog',
-  },
-
- ];
+];
 
 export default function BlogBannerHero() {
   const [current, setCurrent] = useState(0);
@@ -89,7 +66,7 @@ export default function BlogBannerHero() {
   const slide = slides[current];
 
   return (
-    <section className="relative w-full overflow-hidden px-4" aria-label="Bannière E-Propulse - Expert en Intelligence Artificielle">
+    <section className="relative w-full overflow-hidden px-4" aria-label="Bannière Blog Propulser">
       <div className="w-full md:w-[80%] mx-auto">
         <div className="relative w-full aspect-[6/3.5] md:aspect-[16/6] rounded-3xl overflow-hidden">
           {isLoading && (
@@ -141,22 +118,13 @@ export default function BlogBannerHero() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="mt-4 md:mt-6 flex flex-col sm:flex-row gap-3"
+              className="mt-4 md:mt-6"
             >
-              {/* Premier CTA - Toujours visible */}
               <Link
                 href={slide.ctaHref}
-                className="inline-block bg-[#0F23E8] text-white px-6 md:px-8 py-2 md:py-3 rounded-xl text-sm md:text-lg font-semibold hover:bg-[#0A1ACF] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center"
+                className="inline-block bg-[#0F23E8] text-white px-6 md:px-8 py-2 md:py-3 rounded-xl text-sm md:text-lg font-semibold hover:bg-[#0A1ACF] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 {slide.ctaText}
-              </Link>
-              
-              {/* Deuxième CTA - Uniquement sur desktop */}
-              <Link
-                href="/contact"
-                className="hidden md:inline-block bg-white/20 text-white px-6 md:px-8 py-2 md:py-3 rounded-xl text-sm md:text-lg font-semibold hover:bg-white/30 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-center border border-white/30"
-              >
-                Nous contacter
               </Link>
             </motion.div>
           </div>
