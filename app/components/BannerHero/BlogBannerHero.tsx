@@ -24,7 +24,7 @@ const slides: Slide[] = [
     subtitle: 'Découvrez, apprenez, évoluez',
     description: 'Une collection d\'articles, de guides et de ressources pour vous aider à développer vos compétences et réussir dans votre parcours professionnel.',
     ctaText: 'Découvrir les articles',
-    ctaHref: '#articles',
+    ctaHref: '/blog',
   },
   {
     imageDesktop: 'https://images.unsplash.com/photo-1456324504439-367cee3b3c32?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1600&q=80',
@@ -34,7 +34,7 @@ const slides: Slide[] = [
     subtitle: 'Apprenez par la pratique',
     description: 'Des tutoriels détaillés et des guides pratiques pour maîtriser de nouvelles compétences et techniques.',
     ctaText: 'Voir les guides',
-    ctaHref: '/blog/category/tutoriels',
+    ctaHref: '/blog',
   }
 ];
 
