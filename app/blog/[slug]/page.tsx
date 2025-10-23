@@ -466,39 +466,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
                 />
               </section>
 
-              {/* Statistiques */}
-              <section className="bg-white rounded-2xl p-6 border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-4">Statistiques</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 flex items-center gap-2">
-                      <Clock size={14} />
-                      Temps de lecture
-                    </span>
-                    <span className="font-semibold text-gray-900">{readingTime} min</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 flex items-center gap-2">
-                      <Eye size={14} />
-                      Vues
-                    </span>
-                    <span className="font-semibold text-gray-900">{(post.views || 0).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-gray-600 flex items-center gap-2">
-                      <Calendar size={14} />
-                      Publié le
-                    </span>
-                    <span className="font-semibold text-gray-900 text-right">
-                      {new Date(publishedAt).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                </div>
-              </section>
+            
 
               {/* Catégorie */}
               {post.category && (

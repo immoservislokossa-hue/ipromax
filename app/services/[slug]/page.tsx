@@ -211,7 +211,7 @@ const ServiceDetailPage = async ({ params }: Props) => {
 
       {/* Service Detail */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <article className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
+        <article className="brounded-2xl shadow-2xl overflow-hidden border border-gray-100">
           {/* Hero Section avec Next.js Image */}
           <div className="relative h-80 lg:h-96">
             <Image 
@@ -226,15 +226,7 @@ const ServiceDetailPage = async ({ params }: Props) => {
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
-            
-            {/* Badge Disponibilité Mondiale */}
-            <div className="absolute top-6 right-6">
-              <div className="bg-green-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
-                <Globe size={16} aria-hidden="true" />
-                <span className="text-sm font-semibold">Disponible Mondialement</span>
-              </div>
-            </div>
-
+           
             <div className="absolute bottom-6 left-8 right-8">
               <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                 <div className="flex-1">

@@ -114,7 +114,7 @@ export default function ProductsPage() {
 
   // 🎨 Rendu principal
   return (
-    <div className="bg-[#F2F2FF] min-h-screen text-gray-900">
+    <div className=" min-h-screen text-gray-900">
       {/* SEO principal */}
       <h1 className="sr-only">
         Boutique Propulser — formations, outils digitaux et produits premium

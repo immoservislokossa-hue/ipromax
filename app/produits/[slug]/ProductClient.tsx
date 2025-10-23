@@ -103,8 +103,8 @@ export default function ProductClient({ product }: { product: any }) {
     <div
       className={`relative min-h-screen text-gray-900 ${
         product.is_luxury
-          ? 'bg-gradient-to-br from-white via-amber-50/30 to-orange-50/20'
-          : 'bg-gradient-to-br from-white via-blue-50/20 to-gray-50'
+          ? ''
+          : ''
       }`}
     >
      

@@ -83,7 +83,7 @@ export const services: Service[] = [
       "Sous-titres automatiques multilingues",
       "Adaptation aux ratios de chaque plateforme"
     ],
-    image: "https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=1528&q=80",
     category: 'création',
     price: {
       startingFrom: 75000,

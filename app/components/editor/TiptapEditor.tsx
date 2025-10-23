@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -12,7 +11,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { 
   Bold, Italic, Underline as UnderlineIcon, Heading1, Heading2, Heading3,
   List, ListOrdered, Quote, Undo, Redo, AlignLeft, AlignCenter,
-  Link as LinkIcon, Image as ImageIcon, Eye
+  Link as LinkIcon, Image as ImageIcon, Eye, Trash2
 } from 'lucide-react';
 
 interface TiptapEditorProps {
@@ -24,7 +23,6 @@ interface TiptapEditorProps {
 export default function TiptapEditor({ content, onChange, placeholder = "Commencez à rédiger votre article..." }: TiptapEditorProps) {
   const [mounted, setMounted] = useState(false);
 
-  // ✅ Empêche l'exécution côté serveur
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -36,29 +34,175 @@ export default function TiptapEditor({ content, onChange, placeholder = "Commenc
       }),
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      Image.configure({ HTMLAttributes: { class: 'rounded-lg max-w-full h-auto' } }),
+      Image.configure({ 
+        HTMLAttributes: { 
+          class: 'rounded-lg max-w-full h-auto',
+        },
+        allowBase64: true,
+      }),
       Link.configure({
         HTMLAttributes: { class: 'text-blue-600 underline' },
         openOnClick: false,
+        autolink: true,
       }),
       Placeholder.configure({ placeholder }),
     ],
     content,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
-      const text = editor.getText();
       onChange(html);
     },
     editorProps: {
       attributes: {
         class: 'prose prose-lg max-w-none focus:outline-none min-h-[300px] p-6',
       },
+      handlePaste: (view, event) => {
+        const clipboardData = event.clipboardData;
+        if (!clipboardData) return false;
+
+        // Récupérer le HTML collé
+        const pastedHTML = clipboardData.getData('text/html');
+        
+        if (pastedHTML) {
+          // Empêcher le comportement par défaut
+          event.preventDefault();
+          
+          // Utiliser la méthode insertContent pour insérer le HTML
+          const { state, dispatch } = view;
+          const { selection } = state;
+          const { from, to } = selection;
+          
+          // Créer un élément DOM temporaire pour parser le HTML
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = pastedHTML;
+          
+          // Convertir le HTML en nodes ProseMirror
+          const fragment = documentFragmentFromHTML(view.state.schema, pastedHTML);
+          
+          if (fragment) {
+            // Remplacer la sélection par le fragment
+            const tr = state.tr.replaceWith(from, to, fragment);
+            dispatch(tr);
+            return true;
+          }
+        }
+        
+        // Fallback: utiliser le texte brut
+        const pastedText = clipboardData.getData('text/plain');
+        if (pastedText) {
+          event.preventDefault();
+          const { state, dispatch } = view;
+          const { selection } = state;
+          const { from, to } = selection;
+          
+          const tr = state.tr.replaceWith(from, to, state.schema.text(pastedText));
+          dispatch(tr);
+          return true;
+        }
+        
+        return false;
+      },
+      handleDrop: (view, event) => {
+        const { dataTransfer } = event;
+        if (!dataTransfer) return false;
+
+        const html = dataTransfer.getData('text/html');
+        if (html) {
+          event.preventDefault();
+          
+          const { state, dispatch } = view;
+          const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY });
+          if (!coordinates) return false;
+
+          // Convertir le HTML en nodes ProseMirror
+          const fragment = documentFragmentFromHTML(view.state.schema, html);
+          
+          if (fragment) {
+            // Insérer le fragment à la position de drop
+            const tr = state.tr.insert(coordinates.pos, fragment);
+            dispatch(tr);
+            return true;
+          }
+        }
+        
+        return false;
+      },
     },
-    // 🧩 La clé du problème :
     immediatelyRender: false,
   });
 
-  // ⏳ Évite d’appeler Tiptap avant le montage client
+  // Fonction utilitaire pour convertir HTML en fragment ProseMirror
+  const documentFragmentFromHTML = (schema: any, html: string) => {
+    try {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      
+      // Utiliser DOMSerializer pour convertir le HTML en fragment ProseMirror
+      // Cette approche est plus simple et évite les problèmes de parsing complexes
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Pour une solution simple, on peut utiliser le texte seulement
+      // ou implémenter une conversion manuelle pour les cas simples
+      const textContent = tempDiv.textContent || '';
+      return schema.text(textContent);
+      
+    } catch (error) {
+      console.error('Error parsing HTML:', error);
+      return null;
+    }
+  };
+
+  // Fonction pour nettoyer le contenu HTML
+  const cleanHTML = (html: string) => {
+    // Supprimer les balises script et style pour la sécurité
+    const cleaned = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/ on\w+="[^"]*"/g, ''); // Supprimer les attributs d'événements
+    
+    return cleaned;
+  };
+
+  // Fonction pour importer du HTML externe
+  const handleImportHTML = () => {
+    const html = prompt('Collez votre HTML ici:');
+    if (html && editor) {
+      const cleanedHTML = cleanHTML(html);
+      editor.commands.setContent(cleanedHTML);
+    }
+  };
+
+  // Fonction pour effacer tout le contenu
+  const handleClearContent = () => {
+    if (editor && confirm('Êtes-vous sûr de vouloir effacer tout le contenu ?')) {
+      editor.commands.clearContent();
+    }
+  };
+
+  // Fonction pour insérer une image via URL
+  const handleInsertImage = () => {
+    const url = prompt("Entrez l'URL de l'image:");
+    if (url && editor) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  // Fonction pour insérer un lien
+  const handleInsertLink = () => {
+    const url = prompt("Entrez l'URL du lien:");
+    if (url && editor) {
+      // Si du texte est sélectionné, transformer en lien
+      if (editor.state.selection.empty) {
+        // Si pas de sélection, insérer le lien comme texte
+        editor.chain().focus().setLink({ href: url }).insertContent(url).run();
+      } else {
+        // Appliquer le lien à la sélection
+        editor.chain().focus().setLink({ href: url }).run();
+      }
+    }
+  };
+
   if (!mounted) {
     return (
       <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 min-h-[400px] flex items-center justify-center">
@@ -73,7 +217,7 @@ export default function TiptapEditor({ content, onChange, placeholder = "Commenc
   if (!editor) return null;
 
   return (
- <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-sm">
+    <div className="border border-gray-300 rounded-xl overflow-hidden bg-white shadow-sm">
       {/* Barre d'outils */}
       <div className="border-b border-gray-200 bg-gray-50 p-3 flex flex-wrap items-center gap-1">
         {/* Style de texte */}
@@ -199,7 +343,44 @@ export default function TiptapEditor({ content, onChange, placeholder = "Commenc
           <Quote size={18} />
         </button>
 
-       
+        {/* Lien */}
+        <button
+          onClick={handleInsertLink}
+          className={`p-2 rounded-lg transition-colors ${
+            editor.isActive('link') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-200'
+          }`}
+          title="Insérer un lien"
+        >
+          <LinkIcon size={18} />
+        </button>
+
+        {/* Image */}
+        <button
+          onClick={handleInsertImage}
+          className="p-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors"
+          title="Insérer une image"
+        >
+          <ImageIcon size={18} />
+        </button>
+
+        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+        {/* Outils supplémentaires */}
+        <button
+          onClick={handleImportHTML}
+          className="p-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors"
+          title="Importer du HTML"
+        >
+          HTML
+        </button>
+
+        <button
+          onClick={handleClearContent}
+          className="p-2 rounded-lg text-gray-600 hover:bg-red-100 hover:text-red-600 transition-colors"
+          title="Effacer tout le contenu"
+        >
+          <Trash2 size={18} />
+        </button>
 
         <div className="w-px h-6 bg-gray-300 mx-1"></div>
 
@@ -223,13 +404,22 @@ export default function TiptapEditor({ content, onChange, placeholder = "Commenc
         </button>
       </div>
 
-      <EditorContent editor={editor} className="min-h-[400px] max-h-[600px] overflow-y-auto" />
+      <EditorContent 
+        editor={editor} 
+        className="min-h-[400px] max-h-[600px] overflow-y-auto" 
+      />
 
       <div className="border-t border-gray-200 bg-gray-50 px-6 py-3 flex justify-between items-center text-sm text-gray-600">
         <span className="flex items-center gap-1">
           <Eye size={16} />
-          Aperçu en temps réel
+          Aperçu en temps réel - Collage HTML automatique activé
         </span>
+        <button
+          onClick={handleImportHTML}
+          className="text-blue-600 hover:text-blue-800 text-xs underline"
+        >
+          Importer du HTML
+        </button>
       </div>
     </div>
   );
